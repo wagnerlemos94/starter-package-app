@@ -13,7 +13,7 @@ export default function Button(
     { nome,
         onClick,
         icon,
-        backgroundColor = "primary",
+        backgroundColor = "primaryHover",
         color = "white",
         type = "button"
 
@@ -24,10 +24,12 @@ export default function Button(
                 backgroundColor: theme.color[backgroundColor],
                 color: theme.color[color],
                 borderRadius: 2,
-                marginRight: 1,
-                padding: icon ? "6px" : "4px",
-                paddingRight: icon ? "21px" : "10px",
-                paddingLeft: "11px",
+                minHeight: 40,
+                px: icon ? 2.25 : 2,
+                py: 1,
+                gap: 1,
+                fontWeight: 600,
+                textTransform: "none",
             }}
             key={nome}
             onClick={onClick}

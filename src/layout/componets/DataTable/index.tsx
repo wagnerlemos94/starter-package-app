@@ -49,7 +49,7 @@ export function DataTable<T extends object>({ columns, data, className, titulo =
 	);
 
 	return (
-		<Container maxWidth={'xl'}>
+		<Container maxWidth={'xl'} sx={{ py: { xs: 2, md: 4 } }}>
 
 			<TableContainer
 				component={Paper}
@@ -60,7 +60,10 @@ export function DataTable<T extends object>({ columns, data, className, titulo =
 					display: 'flex',
 					flexDirection: 'column',
 					minHeight: '100%',
-					padding: 8,
+					padding: { xs: 2, sm: 3, md: 4 },
+					borderRadius: 3,
+					border: '1px solid #E5E7EB',
+					boxShadow: '0 1px 3px rgba(15, 23, 42, 0.06)',
 					...containerProps?.sx,
 				}}
 			>
@@ -84,7 +87,7 @@ export function DataTable<T extends object>({ columns, data, className, titulo =
 				</Box>
 				<Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
 					<Table sx={{ width: '100%', flex: 1, height: '100%' }}>
-						<TableHead sx={{ backgroundColor: "#f5f5f5" }}>
+						<TableHead sx={{ backgroundColor: "#F8FAFC" }}>
 							<TableRow>
 								{columns.map((col) => (
 									<TableCell key={String(col.key)}>{col.label}</TableCell>
@@ -103,7 +106,7 @@ export function DataTable<T extends object>({ columns, data, className, titulo =
 								</TableRow>
 							) : (
 								data.map((row: T, idx) => (
-									<TableRow key={idx}>
+									<TableRow key={idx} hover>
 										{columns.map((col) => (
 											<TableCell key={String(col.key)}>
 												{col.render ? col.render((row as any)[col.key], row) : String((row as any)[col.key])}

@@ -19,6 +19,7 @@ export default function useFormExempo() {
     } = useForm<ExemploFormSchema>({
         resolver: zodResolver(exemploFormSchema),
         defaultValues: exemploFormDefaultValues,
+        mode: "onChange", // ou "onBlur" dependendo da sua necessidade
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -113,7 +114,7 @@ export default function useFormExempo() {
 
     return {
         action: {
-            salvar: handleSubmit(salvar,  () => console.log("Erros de validação:", errors)),
+            salvar: handleSubmit(salvar, () => console.log("Erros de validação:", errors)),
             setOpen
         },
         data: {

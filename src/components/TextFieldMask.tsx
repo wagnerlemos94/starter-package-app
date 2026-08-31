@@ -7,7 +7,7 @@ type MaskedTextFieldProps = TextFieldProps & {
 };
 
 const TextFieldMask = React.forwardRef<HTMLInputElement, MaskedTextFieldProps>(
-  ({ mask, onChange, value, ...props }, ref) => {
+  ({ mask, onChange, value, fullWidth = true, sx, ...props }, ref) => {
     const maskGenerator = mask ? createDefaultMaskGenerator(mask) : undefined;
 
     const { value: maskedValue, onChange: onMaskedChange, ref: inputRef } = useWebMask({
@@ -30,12 +30,22 @@ const TextFieldMask = React.forwardRef<HTMLInputElement, MaskedTextFieldProps>(
     return (
       <TextField
         {...props}
+        fullWidth={fullWidth}
         inputRef={inputRef}
         value={maskedValue}
         onChange={onMaskedChange}
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            borderRadius: 2,
+            backgroundColor: '#FFFFFF',
+          },
+          ...sx,
+        }}
       />
     );
   }
 );
+
+TextFieldMask.displayName = 'TextFieldMask';
 
 export default TextFieldMask;

@@ -7,10 +7,10 @@ type UUID = string;
 
 export interface IRecursoResponse {
   id: UUID;
-  name: string;
-  key: string;
-  description: string;
-  active: boolean;
+  nome: string;
+  chave: string;
+  descricao: string;
+  ativo: boolean;
 }
 
 export const useApiRecurso = () => {

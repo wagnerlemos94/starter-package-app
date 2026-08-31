@@ -12,7 +12,7 @@ const useUsuario = () => {
   const columns = [
     { key: 'name', label: 'Nome' },
     { key: 'cpf', label: 'CPF' },
-    { key: 'active', label: 'Ativo' },
+    { key: 'active', label: 'Status' },
     {
       key: 'profile',
       label: 'Perfil',
@@ -50,7 +50,10 @@ const useUsuario = () => {
     try {
       const response = await list();
       if (response && response.success) {
-        setListUsuario(response.data || []);
+        setListUsuario(response.data.map((item: IUsuarioResponse) => ({
+          ...item,
+          active: item.active ? 'Ativo' : 'Inativo',
+        })) || []);
       }
       return response;
     } catch (error) {

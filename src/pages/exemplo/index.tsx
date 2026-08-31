@@ -20,17 +20,16 @@ export default function Exemplo() {
     return (
         <>
             <DataTable<IExemplo>
+                resource='USUARIO'
                 titulo="Lista de exemplo"
                 columns={columns}
                 data={list}
                 loading={loading}
-                buttonList={[
-                    {
-                        nome: "novo",
-                        icon: <AddIcon sx={{ marginRight: 1 }} />,
-                        redirect: "/exemplo/form"
-                    },                    
-                ]}
+                buttonCadastro={{
+                    nome: "novo",
+                    icon: <AddIcon sx={{ marginRight: 1 }} />,
+                    redirect: "/exemplo/form"
+                }}
                 action={{
                     edit: {
                         onChange: (t: IExemplo) => edit(t)
@@ -45,7 +44,7 @@ export default function Exemplo() {
                         confirmDelete: true
                     },
                 }}
-                
+
             />
         </>
     )

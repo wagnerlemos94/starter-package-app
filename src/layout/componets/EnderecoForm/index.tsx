@@ -7,8 +7,9 @@ import {
   FormControl,
   InputLabel,
   Select,
-  Button,
+  IconButton,
   CircularProgress,
+  InputAdornment,
 } from "@mui/material";
 import {
   UseFormRegister,
@@ -25,7 +26,6 @@ type EnderecoFormProps<
   TFieldValues extends Record<string, any> = Record<string, any>,
 > = {
   register: UseFormRegister<TFieldValues>;
-  // `errors` can be the full form errors or already the nested `endereco` errors.
   errors?: FieldErrors<TFieldValues> | FieldErrors<any> | undefined;
   control?: Control<TFieldValues>;
   setValue?: UseFormSetValue<TFieldValues>;
@@ -45,221 +45,196 @@ export default function EnderecoForm<
     action: { buscarViaCep },
     data: { cepLoading, UFS },
   } = useEnderecoForm({ setValue, namePrefix });
+
+  const getError = (field: string) => {
+    return (
+      (errors as any)?.[namePrefix]?.[field] ??
+      (errors as any)?.[field]
+    );
+  };
+
   return (
     <Box
       sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 2,
         width: "100%",
-        marginTop: 2,        
+        mt: 3,
       }}
     >
-      <Divider>Endereço</Divider>
-      <Grid container spacing={2} sx={{ width: "100%", marginTop: 1 }}>
-        <Grid>
+      <Divider
+        textAlign="left"
+        sx={{
+          mb: 2,
+          color: "#0F172A",
+          fontWeight: 700,
+          fontSize: "0.9rem",
+        }}
+      >
+        Endereço
+      </Divider>
+
+      <Grid container spacing={2}>
+        {/* CEP */}
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Controller
             name={`${namePrefix}.cep` as any}
             control={control}
             render={({ field }) => (
-              <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-                <TextFieldMask
-                  id="outlined-cep"
-                  label="CEP"
-                  placeholder="00000-000"
-                  fullWidth
-                  size="small"
-                  margin="dense"
-                  mask="99999-999"
-                  error={
-                    !!(
-                      (errors as any)?.[namePrefix]?.cep ?? (errors as any)?.cep
-                    )
-                  }
-                  helperText={
-                    ((errors as any)?.[namePrefix]?.cep?.message ??
-                      (errors as any)?.cep?.message) as any
-                  }
-                  {...field}
-                />
-                <Button
-                  size="small"
-                  onClick={() => buscarViaCep(field.value || "")}
-                  disabled={cepLoading}
-                  sx={{ marginLeft: "-25px", marginRight: "-30px" }}
-                >
-                  {cepLoading ? <CircularProgress size={18} /> : <SearchIcon />}
-                </Button>
-              </Box>
-            )}
-          />
-        </Grid>
-
-        <Grid>
-          <Controller
-            name={`${namePrefix}.logradouro` as any}
-            control={control}
-            render={({ field }) => (
-              <TextField
-                id="outlined-logradouro"
-                label="Rua"
-                placeholder="Nome da rua"
+              <TextFieldMask
+                {...field}
+                id="outlined-cep"
+                label="CEP"
+                placeholder="00000-000"
                 fullWidth
                 size="small"
-                margin="dense"
-                error={
-                  !!(
-                    (errors as any)?.[namePrefix]?.logradouro ??
-                    (errors as any)?.logradouro
-                  )
-                }
-                helperText={
-                  ((errors as any)?.[namePrefix]?.logradouro.message ??
-                    (errors as any)?.logradouro?.message) as any
-                }
-                {...field}
+                mask="99999-999"
+                error={!!getError("cep")}
+                helperText={getError("cep")?.message}
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          edge="end"
+                          size="small"
+                          onClick={() => buscarViaCep(field.value || "")}
+                          disabled={cepLoading}
+                          aria-label="Buscar CEP"
+                        >
+                          {cepLoading ? (
+                            <CircularProgress size={18} />
+                          ) : (
+                            <SearchIcon fontSize="small" />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  },
+                }}
               />
             )}
           />
         </Grid>
 
-        <Grid>
+        {/* Rua */}
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <Controller
+            name={`${namePrefix}.logradouro` as any}
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                id="outlined-logradouro"
+                label="Rua"
+                placeholder="Nome da rua"
+                fullWidth
+                size="small"
+                error={!!getError("logradouro")}
+                helperText={getError("logradouro")?.message}
+              />
+            )}
+          />
+        </Grid>
+
+        {/* Número */}
+        <Grid size={{ xs: 12, sm: 6, md: 2 }}>
           <Controller
             name={`${namePrefix}.numero` as any}
             control={control}
-            render={({ field }) => (
+            render={() => (
               <TextField
                 id="outlined-numero"
                 label="Número"
                 placeholder="Número"
-                defaultValue=""
                 fullWidth
                 size="small"
-                margin="dense"
-                focused={true}
-                error={
-                  !!(
-                    (errors as any)?.[namePrefix]?.numero ??
-                    (errors as any)?.numero
-                  )
-                }
-                helperText={
-                  ((errors as any)?.[namePrefix]?.numero?.message ??
-                    (errors as any)?.numero?.message) as any
-                }
+                error={!!getError("numero")}
+                helperText={getError("numero")?.message}
                 {...register(`${namePrefix}.numero` as any)}
               />
             )}
           />
         </Grid>
 
-        <Grid>
+        {/* Complemento */}
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Controller
             name={`${namePrefix}.complemento` as any}
             control={control}
-            render={({ field }) => (
+            render={() => (
               <TextField
                 id="outlined-complemento"
                 label="Complemento"
-                placeholder="Apartamento, bloco, casa, etc. (opcional)"
-                defaultValue=""
+                placeholder="Apto, bloco..."
                 fullWidth
                 size="small"
-                margin="dense"
-                focused={true}
-                error={
-                  !!(
-                    (errors as any)?.[namePrefix]?.complemento ??
-                    (errors as any)?.complemento
-                  )
-                }
-                helperText={
-                  ((errors as any)?.[namePrefix]?.complemento?.message ??
-                    (errors as any)?.complemento?.message) as any
-                }
+                error={!!getError("complemento")}
+                helperText={getError("complemento")?.message}
                 {...register(`${namePrefix}.complemento` as any)}
               />
             )}
           />
         </Grid>
 
-        <Grid>
+        {/* Bairro */}
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <Controller
             name={`${namePrefix}.bairro` as any}
             control={control}
             render={({ field }) => (
               <TextField
                 {...field}
-                error={
-                  !!(
-                    (errors as any)?.[namePrefix]?.bairro ??
-                    (errors as any)?.bairro
-                  )
-                }
-                helperText={
-                  ((errors as any)?.[namePrefix]?.bairro?.message ??
-                    (errors as any)?.bairro?.message) as any
-                }
                 id="outlined-bairro"
                 label="Bairro"
                 placeholder="Nome do bairro"
                 fullWidth
                 size="small"
-                margin="dense"
+                error={!!getError("bairro")}
+                helperText={getError("bairro")?.message}
               />
             )}
           />
         </Grid>
 
-        <Grid>
+        {/* Cidade */}
+        <Grid size={{ xs: 12, sm: 6, md: 5 }}>
           <Controller
             name={`${namePrefix}.cidade` as any}
             control={control}
             render={({ field }) => (
               <TextField
                 {...field}
-                error={
-                  !!(
-                    (errors as any)?.[namePrefix]?.cidade ??
-                    (errors as any)?.cidade
-                  )
-                }
-                helperText={
-                  ((errors as any)?.[namePrefix]?.cidade?.message ??
-                    (errors as any)?.cidade?.message) as any
-                }
                 id="outlined-cidade"
                 label="Cidade"
                 placeholder="Nome da cidade"
                 fullWidth
                 size="small"
-                margin="dense"
+                error={!!getError("cidade")}
+                helperText={getError("cidade")?.message}
               />
             )}
           />
         </Grid>
 
-        <Grid>
+        {/* Estado */}
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Controller
             name={`${namePrefix}.estado` as any}
             control={control}
             render={({ field }) => (
-              <FormControl fullWidth margin="dense">
+              <FormControl
+                fullWidth
+                size="small"
+                error={!!getError("estado")}
+              >
                 <InputLabel id={`estado-label-${namePrefix}`}>
                   Estado
                 </InputLabel>
+
                 <Select
+                  {...field}
                   labelId={`estado-label-${namePrefix}`}
                   id="outlined-estado"
                   label="Estado"
-                  {...field}
-                  error={
-                    !!(
-                      (errors as any)?.[namePrefix]?.estado ??
-                      (errors as any)?.estado
-                    )
-                  }
-                  size="small"
                 >
                   {UFS.map((uf) => (
                     <MenuItem key={uf} value={uf}>

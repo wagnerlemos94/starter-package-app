@@ -3,14 +3,13 @@ import DatePicker from "react-datepicker";
 import TextField from "@mui/material/TextField";
 import "react-datepicker/dist/react-datepicker.css";
 
-
 export interface DatePickerFieldProps {
   label?: string;
   error?: boolean;
   helperText?: React.ReactNode;
   onChange: (date: Date | null) => void;
   value: Date | null;
-  [key: string]: any; // permite props adicionais se necessário
+  [key: string]: any;
 }
 
 const DatePickerField: React.FC<DatePickerFieldProps> = ({
@@ -31,10 +30,17 @@ const DatePickerField: React.FC<DatePickerFieldProps> = ({
           error={error}
           helperText={helperText}
           fullWidth
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              borderRadius: 2,
+              backgroundColor: '#FFFFFF',
+            },
+          }}
         />
       }
       dateFormat="dd/MM/yyyy"
       placeholderText="DD/MM/AAAA"
+      wrapperClassName="date-picker-full-width"
       {...props}
     />
   );

@@ -6,15 +6,13 @@ const Footer: React.FC = () => {
   return (
     <footer style={{
       width: '100%',
-      padding: '1rem',
-      background: theme.color.primary,
-      borderTop: `1px solid ${theme.color.white}`,
+      padding: '1rem 1.5rem',
+      background: 'transparent',
+      borderTop: '1px solid #E5E7EB',
       textAlign: 'center',
-      fontSize: '1rem',
-      color: theme.color.white,
-      position: 'fixed',
-      bottom: 0,
-      left: 0,
+      fontSize: '0.8rem',
+      color: theme.color.info,
+      marginTop: 'auto',
     }}>
       © {new Date().getFullYear()} {appConfig.nomeSistema}. Todos os direitos reservados.
     </footer>

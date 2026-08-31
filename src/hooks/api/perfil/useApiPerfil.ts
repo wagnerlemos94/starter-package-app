@@ -7,29 +7,29 @@ type UUID = string;
 
 export interface IPerfilRequest {
     id?: UUID;
-    name: string;
-    description: string;
-    active: boolean;
-    profilesResource: Record<UUID, UUID[]>;
+    nome: string;
+    descricao: string;
+    ativo: boolean;
+    perfilRecurso: Record<UUID, UUID[]>;
 }
 
 export interface IPerfilResponse {
     id: UUID;
-    name: string;
-    key?: string;
-    description: string;
-    active: boolean;
-    profilesResource?: Record<UUID, UUID[]>;
-    profileResourceResponse?: Array<{
+    nome: string;
+    chave?: string;
+    descricao: string;
+    ativo: boolean | string;
+    perfilRecurso?: Record<UUID, UUID[]>;
+    perfilRecursoResponse?: Array<{
         id: UUID;
-        resourceId: UUID;
-        resource: string;
-        permission?: Array<{
+        recursoId: UUID;
+        recurso: string;
+        permissoes?: Array<{
             id: UUID;
-            name: string;
-            key: string;
-            description: string;
-            active: boolean;
+            nome: string;
+            chave: string;
+            descricao: string;
+            ativo: boolean;
         }>;
     }>;
 }

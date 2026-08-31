@@ -1,4 +1,4 @@
-import { Box, Button, Grid, TextField } from "@mui/material";
+import { Box, Grid, TextField } from "@mui/material";
 import DatePickerField from "@/components/DatePickerField";
 import TextFieldMask from "@/components/TextFieldMask";
 import useForm from "./useFormExempo";
@@ -31,28 +31,22 @@ export default function Form() {
             onSubmit={salvar}
             titulo="Formulário de exemplo"
             subTitulo={["Exemplo /", "Novo"]}
-            isSubmitting={isSubmitting || loading}>
+            isSubmitting={isSubmitting || loading}
+        >
+            <Box sx={{ width: "100%" }}>
+                <Grid container spacing={2}>
+                    <Grid size={{ xs: 12 }}>
+                        <TextField
+                            error={!!errors.nome}
+                            helperText={errors.nome?.message}
+                            label="Nome completo"
+                            placeholder="Nome completo"
+                            fullWidth
+                            {...register("nome")}
+                        />
+                    </Grid>
 
-            <Box
-                sx={{
-                    width: '100%',
-                    '& .MuiTextField-root': { m: 1, width: '100%' },
-                }}
-            >
-                <Box sx={{ display: 'flex', gap: 2, width: '100%' }}>
-                    <TextField
-                        error={!!errors.nome}
-                        helperText={errors.nome?.message}
-                        id="outlined-error"
-                        label={control._formValues.nome ? "" : "Nome completo"}
-                        placeholder="Nome completo"
-                        defaultValue=""
-                        fullWidth
-                        {...register("nome")}
-                    />
-                </Box>
-                <Box sx={{ display: 'flex', gap: 2, width: '100%' }}>
-                    <Box sx={{ flex: 1 }}>
+                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                         <Controller
                             name="nascimento"
                             control={control}
@@ -62,12 +56,15 @@ export default function Form() {
                                     error={!!errors.nascimento}
                                     helperText={errors.nascimento?.message}
                                     value={field.value ?? null}
-                                    onChange={(date: Date | null) => field.onChange(date ?? undefined)}
+                                    onChange={(date: Date | null) =>
+                                        field.onChange(date ?? undefined)
+                                    }
                                 />
                             )}
                         />
-                    </Box>
-                    <Box sx={{ flex: 1 }}>
+                    </Grid>
+
+                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                         <Controller
                             name="cpf"
                             control={control}
@@ -76,7 +73,6 @@ export default function Form() {
                                     {...field}
                                     error={!!errors.cpf}
                                     helperText={errors.cpf?.message}
-                                    id="outlined-error-helper-text"
                                     label="CPF"
                                     placeholder="000.000.000-00"
                                     fullWidth
@@ -84,20 +80,20 @@ export default function Form() {
                                 />
                             )}
                         />
-                    </Box>
-                    <Box sx={{ flex: 1 }}>
+                    </Grid>
+
+                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                         <TextField
                             error={!!errors.rg}
                             helperText={errors.rg?.message}
-                            id="outlined-error-helper-text"
                             label="RG"
                             placeholder="00.000.000-0"
-                            defaultValue=""
                             fullWidth
                             {...register("rg")}
                         />
-                    </Box>
-                    <Box sx={{ flex: 1, marginTop: 1 }}>
+                    </Grid>
+
+                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                         <Controller
                             name="responsavel"
                             control={control}
@@ -107,27 +103,28 @@ export default function Form() {
                                     name="Responsável"
                                     error={!!errors.responsavel}
                                     helperText={errors.responsavel?.message}
-                                    value={field.value ?? ''}
+                                    value={field.value ?? ""}
                                     onChange={(v) => field.onChange(v)}
                                 />
                             )}
                         />
-                    </Box>
-                </Box>
+                    </Grid>
+                </Grid>
             </Box>
+
             <EnderecoForm
                 register={register}
                 errors={errors.endereco}
                 control={control}
                 setValue={setValue}
             />
+
             <ContatosForm
                 register={register}
                 errors={errors.contato}
                 control={control}
-                setValue={setValue}        
+                setValue={setValue}
             />
-            
         </FormComponent>
     );
 }

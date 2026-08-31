@@ -1,9 +1,8 @@
-import React, { Children, Fragment, useState } from 'react';
-import Button from '@mui/material/Button';
+import React, { Fragment } from 'react';
+import Button from "@/layout/componets/Button";
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
 export interface IModalProps {
@@ -15,45 +14,67 @@ export interface IModalProps {
 }
 
 export default function Modal({ titulo, children, open, setOpen, buttonAcao }: IModalProps) {
-
     const handleClose = () => {
         setOpen(false);
     };
 
     return (
         <Fragment>
-            {/* <Button variant="outlined" onClick={handleClickOpen}>
-                Open alert dialog
-            </Button> */}
             <Dialog
                 open={open}
-                // onClose={handleClose}
+                onClose={handleClose}
                 aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-                role="alertdialog"
-                sx={{ '& .MuiDialog-paper': { width: '80%', maxHeight: 435, height: '50%' } }} 
+                role="dialog"
+                fullWidth
+                maxWidth="md"
+                sx={{
+                    borderRadius: 3,
+                    border: '1px solid #E5E7EB',
+                    boxShadow: '0 20px 45px rgba(15, 23, 42, 0.14)',
+                    maxHeight: '82vh',
+                }}
             >
-                <DialogTitle id="alert-dialog-title" sx={{ fontSize: '1.5rem', fontWeight: 'bold' , textAlign: 'center' }}>
+                <DialogTitle
+                    id="alert-dialog-title"
+                    sx={{
+                        px: { xs: 2.5, md: 3.5 },
+                        pt: 3,
+                        pb: 2,
+                        fontSize: '1.35rem',
+                        fontWeight: 700,
+                        color: '#111827',
+                        borderBottom: '1px solid #EEF0F3',
+                    }}
+                >
                     {titulo}
                 </DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        {children}
-                    </DialogContentText>
+
+                <DialogContent sx={{ px: { xs: 2.5, md: 3.5 }, py: 3 }}>
+                    {children}
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose} autoFocus>
-                        fechar
-                    </Button>
-                    {
-                        buttonAcao && (
-                            <Button onClick={buttonAcao}>
-                                ação
-                            </Button>
-                        )
-                    }
+
+                <DialogActions
+                    sx={{
+                        px: { xs: 2.5, md: 3.5 },
+                        py: 2.5,
+                        gap: 1,
+                        borderTop: '1px solid #EEF0F3',
+                    }}
+                >
+                    <Button
+                        nome="Fechar"
+                        onClick={handleClose}
+                        sx={{ textTransform: 'none', fontWeight: 600 }}
+                    />
+                    {buttonAcao && (
+                        <Button
+                            onClick={buttonAcao}
+                            sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 2 }}
+                            nome="Ação"
+                        />
+                    )}
                 </DialogActions>
             </Dialog>
         </Fragment>
     );
-} 
+}

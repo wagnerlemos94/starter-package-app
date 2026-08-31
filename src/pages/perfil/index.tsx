@@ -11,7 +11,7 @@ export default function Perfil() {
 
   return (
     <>
-      <DataTable
+      <DataTable<IPerfilResponse>
         resource="PERFIL"
         titulo="Lista de Perfis"
         columns={columns}

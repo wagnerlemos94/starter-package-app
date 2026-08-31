@@ -9,7 +9,7 @@ import { useLogin } from '@/pages/login/useLogin';
 import { appConfig } from '@/constrants';
 
 
-const HEADER_HEIGHT = 60;
+const HEADER_HEIGHT = 64;
 
 const Head: React.FC = () => {
     const [open, setOpen] = useState(false);
@@ -26,12 +26,13 @@ const Head: React.FC = () => {
             <header
                 style={{
                     width: '100%',
-                    padding: '1rem',
+                    height: HEADER_HEIGHT,
+                    padding: '0 1.5rem',
                     background: theme.color.primary,
-                    borderBottom: `1px solid ${theme.color.white}`,
+                    borderBottom: '1px solid rgba(255,255,255,0.08)',
                     textAlign: 'center',
                     fontWeight: 'bold',
-                    fontSize: '1.5rem',
+                    fontSize: '1.25rem',
                     position: 'fixed',
                     top: 0,
                     left: 0,
@@ -39,7 +40,7 @@ const Head: React.FC = () => {
                 }}
             >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginLeft: '4rem', marginTop: '0.6rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginLeft: '3.5rem' }}>
                         <span style={{ color: theme.color.white }}>{appConfig.nomeSistema}</span>
                     </div>
                     <div style={{ position: 'relative' }}>

@@ -11,7 +11,7 @@ export default function Usuario() {
 
   return (
     <>
-      <DataTable
+      <DataTable<IUsuarioResponse>
         resource='USUARIO'
         titulo="Lista de Usuários"
         columns={columns}

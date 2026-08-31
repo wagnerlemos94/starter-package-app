@@ -10,10 +10,10 @@ const usePerfil = () => {
   const { list, remove } = useApiPerfil();
 
   const columns = [
-    { key: 'name', label: 'Nome' },
-    { key: 'key', label: 'Key' },
-    { key: 'description', label: 'Descrição' },
-    { key: 'active', label: 'Ativo' },
+    { key: 'nome', label: 'Nome' },
+    { key: 'chave', label: 'Key' },
+    { key: 'descricao', label: 'Descrição' },
+    { key: 'ativo', label: 'Status' },
   ];
 
   useEffect(() => {
@@ -46,7 +46,10 @@ const usePerfil = () => {
     try {
       const response = await list();
       if (response && response.success) {
-        setListPerfil(response.data || []);
+        setListPerfil(response.data.map((item: IPerfilResponse) => ({
+          ...item,
+          active: item.ativo ? 'Ativo' : 'Inativo',
+        })) || []);
       }
       return response;
     } catch (error) {

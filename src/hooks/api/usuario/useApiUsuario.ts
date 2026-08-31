@@ -22,7 +22,7 @@ export interface IUsuarioResponse {
   id: UUID;
   cpf: string;
   name: string;
-  active: boolean;
+  active: boolean | string;
   profile: IProfileResponse;
 }
 

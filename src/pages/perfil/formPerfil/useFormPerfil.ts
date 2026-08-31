@@ -13,7 +13,7 @@ import { IRecursoResponse } from '@/hooks/api/recurso/useApiRecurso';
 import { IPermissaoResponse } from '@/hooks/api/permissao/useApiPermissao';
 import { useApiRecurso, useApiPermissao } from '@/hooks/api';
 
-type ProfilesResourceMap = Record<string, string[]>;
+type PerfilRecursoMap = Record<string, string[]>;
 
 export default function useFormPerfil() {
   const {
@@ -41,7 +41,7 @@ export default function useFormPerfil() {
   const { list: listRecursosApi } = useApiRecurso();
   const { list: listPermissoesApi } = useApiPermissao();
 
-  const profilesResource = watch('profilesResource');
+  const perfilRecurso = watch('perfilRecurso');
 
   useEffect(() => {
     buscarRecursosEPermissoes();
@@ -50,28 +50,28 @@ export default function useFormPerfil() {
     }
   }, [query.id]);
 
-  const mapToArray = (profilesMap: ProfilesResourceMap, recursos?: IRecursoResponse[]) => {
+  const mapToArray = (perfilMap: PerfilRecursoMap, recursos?: IRecursoResponse[]) => {
     if (recursos && recursos.length > 0) {
       return recursos.map((recurso) => ({
-        resourceId: recurso.id,
-        permissionIds: profilesMap[recurso.id] || [],
+        recursoId: recurso.id,
+        permissaoIds: perfilMap[recurso.id] || [],
       }));
     }
 
-    return Object.entries(profilesMap).map(([resourceId, permissionIds]) => ({
-      resourceId,
-      permissionIds: permissionIds || [],
+    return Object.entries(perfilMap).map(([recursoId, permissaoIds]) => ({
+      recursoId,
+      permissaoIds: permissaoIds || [],
     }));
   };
 
-  const profileResourcesToMap = (profileResources?: Array<{ resource?: { id?: string }; permissions?: Array<{ id?: string }> }>): ProfilesResourceMap => {
-    const map: ProfilesResourceMap = {};
+  const perfilRecursoToMap = (perfilRecurso?: Array<{ recurso?: { id?: string }; permissoes?: Array<{ id?: string }> }>): PerfilRecursoMap => {
+    const map: PerfilRecursoMap = {};
 
-    (profileResources || []).forEach((item) => {
-      const resourceId = item.resource?.id;
-      if (!resourceId) return;
+    (perfilRecurso || []).forEach((item) => {
+      const recursoId = item.recurso?.id;
+      if (!recursoId) return;
 
-      map[resourceId] = (item.permissions || [])
+      map[recursoId] = (item.permissoes || [])
         .map((p) => p.id)
         .filter((id): id is string => !!id);
     });
@@ -80,15 +80,15 @@ export default function useFormPerfil() {
   };
 
   const garantirLinhasRecursos = (recursos: IRecursoResponse[]) => {
-    const atuais = getValues('profilesResource') || [];
+    const atuais = getValues('perfilRecurso') || [];
     const merged = recursos.map((recurso) => {
-      const atual = atuais.find((item) => item.resourceId === recurso.id);
+      const atual = atuais.find((item) => item.recursoId === recurso.id);
       return {
-        resourceId: recurso.id,
-        permissionIds: atual?.permissionIds || [],
+        recursoId: recurso.id,
+        permissaoIds: atual?.permissaoIds || [],
       };
     });
-    setValue('profilesResource', merged, { shouldDirty: false });
+    setValue('perfilRecurso', merged, { shouldDirty: false });
   };
 
   const buscarRecursosEPermissoes = async () => {
@@ -121,17 +121,17 @@ export default function useFormPerfil() {
         return;
       }
 
-      const profilesMap = response.data.profilesResource || profileResourcesToMap(response.data.profileResourceResponse?.map((pr) => ({
-        resource: { id: pr.resourceId },
-        permissions: pr.permission?.map((p) => ({ id: p.id })) || [],
+      const perfilMap = response.data.perfilRecurso || perfilRecursoToMap(response.data.perfilRecursoResponse?.map((pr) => ({
+        recurso: { id: pr.recursoId },
+        permissoes: pr.permissoes?.map((p) => ({ id: p.id })) || [],
       })));
       const recursosAtuais = listRecurso.length > 0 ? listRecurso : undefined;
 
       reset({
-        name: response.data.name,
-        description: response.data.description,
-        active: !!response.data.active,
-        profilesResource: mapToArray(profilesMap, recursosAtuais),
+        nome: response.data.nome,
+        descricao: response.data.descricao,
+        ativo: !!response.data.ativo,
+        perfilRecurso: mapToArray(perfilMap, recursosAtuais),
       });
     } catch (error) {
       showToast('Erro ao carregar os dados!', 'error');
@@ -145,11 +145,11 @@ export default function useFormPerfil() {
     setIsSubmitting(true);
     try {
       const payload = {
-        name: data.name,
-        description: data.description,
-        active: data.active,
-        profilesResource: data.profilesResource.reduce<ProfilesResourceMap>((acc, item) => {
-          acc[item.resourceId] = item.permissionIds || [];
+        nome: data.nome,
+        descricao: data.descricao,
+        ativo: data.ativo,
+        perfilRecurso: data.perfilRecurso.reduce<PerfilRecursoMap>((acc, item) => {
+          acc[item.recursoId] = item.permissaoIds || [];
           return acc;
         }, {}),
       };
@@ -179,7 +179,7 @@ export default function useFormPerfil() {
       isSubmitting,
       listRecurso,
       listPermissao,
-      profilesResource,
+      perfilRecurso,
     },
   };
 }
