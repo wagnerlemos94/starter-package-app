@@ -154,6 +154,8 @@ Páginas ausentes de `src/auth/route-permissions.ts` não recebem controle de pe
 
 Todos os caminhos são relativos a `NEXT_PUBLIC_BASE_URL`.
 
+O cliente HTTP em `src/services/api.ts` interpreta o contrato padronizado de erros da API. O resultado de falha contém `message`, `status`, `errorId` no corpo e a lista `errors`. No formulário de usuário, erros associados a campos são exibidos diretamente nos respectivos controles do React Hook Form.
+
 ## Estrutura principal
 
 ```text

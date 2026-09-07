@@ -1,239 +1,154 @@
-// src/services/api.ts
-// Estrutura base para integração com uma API REST usando fetch
 import { signOut } from 'next-auth/react';
-import { useRouter } from 'next/router';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || '';
 const INTERNAL_SERVER_ERROR = 'Erro interno do servidor. Por favor, tente novamente mais tarde.';
 
-function falhaNaRequisicao(status: number, message: string): { success: false; status: number; message: string } {
-  console.log('Erro na requisição POST:', status, message);
-  return { success: false, status, message: INTERNAL_SERVER_ERROR };
+export interface ApiFieldError {
+  field: string;
+  message: string;
 }
+
+export interface ApiErrorResponse {
+  timestamp?: string;
+  status: number;
+  error: string;
+  message: string;
+  path?: string;
+  errorId?: string;
+  errors: ApiFieldError[];
+}
+
+export type ApiResult<T> =
+  | { success: true; data: T }
+  | {
+      success: false;
+      status: number;
+      message: string;
+      errors: ApiFieldError[];
+      body?: ApiErrorResponse;
+    };
+
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
 function buildUrl(path: string): string {
   if (/^https?:\/\//.test(path)) return path;
   return `${BASE_URL.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
 }
 
-export type RequestOptions = {
-  token?: string;
-  headers?: Record<string, string>;
-};
-
 function getStoredToken(): string | null {
+  if (typeof window === 'undefined') return null;
+
   try {
-    if (typeof window === 'undefined') return null;
     return localStorage.getItem('accessToken');
-  } catch (e) {
+  } catch {
     return null;
   }
 }
 
-const logout = async () => {
-  try {
-    await signOut({ callbackUrl: '/login' });
-    useRouter().push('/login');
-  } catch (err) {
-    console.error('Logout error:', err);
-  }
-};
+function buildHeaders(authenticated: boolean): HeadersInit {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  const token = authenticated ? getStoredToken() : null;
 
-async function removeStoredToken(): Promise<string | null> {
-  try {
-    if (typeof window === 'undefined') return null;
-    localStorage.removeItem('accessToken');
-    await logout();
-    return null;
-  } catch (e) {
-    return null;
-  }
-}
-
-function buildHeaders(contentType = 'application/json') {
-  const headers: Record<string, string> = {};
-  if (contentType) headers['Content-Type'] = contentType;
-  const token = getStoredToken();
-  console.log('Construindo headers para API:', { contentType, token });
-  if (token) headers['Authorization'] = `Bearer ${token}`;
+  if (token) headers.Authorization = `Bearer ${token}`;
   return headers;
 }
 
-export type ApiResult<T> =
-  | { success: true; data: T }
-  | { success: false; status: number; message: string; body?: any };
-
-export async function apiGet<T>(path: string): Promise<ApiResult<T>> {
-  const url = buildUrl(path);
-  try {
-    const response = await fetch(url, { headers: buildHeaders() });
-
-    console.log(response)
-    if (!response.ok) {
-      // try parse error body
-      let errorBody: any = null;
-      try {
-        errorBody = await response.json();
-        if (errorBody && errorBody.status === 401 && errorBody.error === "UNAUTHORIZED" && errorBody.message === 'Token expirado.') {
-          removeStoredToken();
-          return { success: false, status: 401, message: 'Token expirado. Por favor, faça login novamente.', body: errorBody };
-        }
-      } catch (e) {
-        console.warn('Não foi possível parsear o corpo de erro como JSON:', e);
-        // ignore parse error
-      }
-      const message = (errorBody && (errorBody.message || errorBody.error)) || response.statusText || `Request failed with status ${response.status}`;
-      return { success: false, status: response.status, message, body: errorBody };
-    }
-
-    const data = await response.json();
-    return { success: true, data };
-  } catch (err: any) {
-    console.log('Erro na requisição POST:', err);
-    return falhaNaRequisicao(500, "");
-  }
+function isApiErrorResponse(value: unknown): value is ApiErrorResponse {
+  if (!value || typeof value !== 'object') return false;
+  const body = value as Partial<ApiErrorResponse>;
+  return typeof body.status === 'number'
+    && typeof body.error === 'string'
+    && typeof body.message === 'string';
 }
 
-export async function apiPost<T>(path: string, data: any): Promise<ApiResult<T>> {
-  const url = buildUrl(path);
+async function parseError(response: Response): Promise<ApiResult<never>> {
+  let parsedBody: unknown;
+
   try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: buildHeaders('application/json'),
-      body: JSON.stringify(data),
+    parsedBody = await response.json();
+  } catch {
+    parsedBody = undefined;
+  }
+
+  const body = isApiErrorResponse(parsedBody)
+    ? { ...parsedBody, errors: Array.isArray(parsedBody.errors) ? parsedBody.errors : [] }
+    : undefined;
+
+  if (response.status === 401 && body?.message === 'Token expirado.') {
+    if (typeof window !== 'undefined') localStorage.removeItem('accessToken');
+    await signOut({ callbackUrl: '/login' });
+  }
+
+  const errors = body?.errors ?? [];
+  const validationMessage = errors.map((error) => error.message).join('\n');
+  const message = validationMessage
+    || body?.message
+    || response.statusText
+    || `Erro HTTP ${response.status}`;
+
+  return {
+    success: false,
+    status: response.status,
+    message,
+    errors,
+    body,
+  };
+}
+
+function networkError(error: unknown): ApiResult<never> {
+  console.error('Falha ao acessar a API:', error);
+  return {
+    success: false,
+    status: 0,
+    message: INTERNAL_SERVER_ERROR,
+    errors: [],
+  };
+}
+
+async function request<T>(
+  path: string,
+  method: HttpMethod,
+  data?: unknown,
+  authenticated = true,
+): Promise<ApiResult<T>> {
+  try {
+    const response = await fetch(buildUrl(path), {
+      method,
+      headers: buildHeaders(authenticated),
+      body: data === undefined ? undefined : JSON.stringify(data),
     });
 
-    if (!response.ok) {
-      let errorBody: any = null;
-      try {
-        errorBody = await response.json();
-        if (errorBody && errorBody.status === 401 && errorBody.error === "UNAUTHORIZED" && errorBody.message === 'Token expirado.') {
-          removeStoredToken();
-          return { success: false, status: 401, message: 'Token expirado. Por favor, faça login novamente.', body: errorBody };
-        }
-      } catch (e) {
-        console.warn('Não foi possível parsear o corpo de erro como JSON:', e);
-      }
-      const message = (errorBody && (errorBody.message || errorBody.error)) || response.statusText || `Request failed with status ${response.status}`;
-      return { success: false, status: response.status, message, body: errorBody };
-    }
+    if (!response.ok) return parseError(response);
+    if (response.status === 204) return { success: true, data: undefined as T };
 
-    const dataResp = await response.json();
-    return { success: true, data: dataResp };
-
-  } catch (err: any) {
-    console.log('Erro na requisição POST:', err);
-    return falhaNaRequisicao(500, "");
+    const text = await response.text();
+    return {
+      success: true,
+      data: text ? JSON.parse(text) as T : undefined as T,
+    };
+  } catch (error) {
+    return networkError(error);
   }
 }
 
-
-export async function apiPostLogin<T>(path: string, data: any): Promise<ApiResult<T>> {
-  const url = buildUrl(path);
-  // const url = `https://escolar-api-ved3a.ondigitalocean.app/api/${path}`;
-  console.log('Enviando dados para login:', url);
-  try {
-    console.log('Dados enviados para login:', data);
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      let errorBody: any = null;
-      try {
-        errorBody = await response.json();
-        if (errorBody && errorBody.status === 401 && errorBody.error === "UNAUTHORIZED" && errorBody.message === 'Token expirado.') {
-          removeStoredToken();
-          return { success: false, status: 401, message: 'Token expirado. Por favor, faça login novamente.', body: errorBody };
-        }
-      } catch (e) {
-        console.warn('Não foi possível parsear o corpo de erro como JSON:', e);
-      }
-      const message = (errorBody && (errorBody.message || errorBody.error)) || response.statusText || `Request failed with status ${response.status}`;
-      return { success: false, status: response.status, message, body: errorBody };
-    }
-
-    const dataResp = await response.json();
-    return { success: true, data: dataResp };
-
-  } catch (err: any) {
-    console.log('Erro na requisição POST:', err);
-    return falhaNaRequisicao(500, "");
-  }
+export function apiGet<T>(path: string): Promise<ApiResult<T>> {
+  return request<T>(path, 'GET');
 }
 
-export async function apiPut<T>(path: string, data: any): Promise<ApiResult<T>> {
-  const url = buildUrl(path);
-  try {
-    const response = await fetch(url, {
-      method: 'PUT',
-      headers: buildHeaders('application/json'),
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      let errorBody: any = null;
-      try {
-        errorBody = await response.json();
-        if (errorBody && errorBody.status === 401 && errorBody.error === "UNAUTHORIZED" && errorBody.message === 'Token expirado.') {
-          removeStoredToken();
-          return { success: false, status: 401, message: 'Token expirado. Por favor, faça login novamente.', body: errorBody };
-        }
-      } catch (e) {
-        console.warn('Não foi possível parsear o corpo de erro como JSON:', e);
-      }
-      const message = (errorBody && (errorBody.message || errorBody.error)) || response.statusText || `Request failed with status ${response.status}`;
-      return { success: false, status: response.status, message, body: errorBody };
-    }
-
-    const dataResp = await response.json();
-    return { success: true, data: dataResp };
-  } catch (err: any) {
-    console.error('Erro na requisição PUT:', err);
-    const message = err?.message || 'Erro na requisição PUT';
-    return { success: false, status: 0, message, body: err };
-  }
+export function apiPost<T>(path: string, data: unknown): Promise<ApiResult<T>> {
+  return request<T>(path, 'POST', data);
 }
 
-export async function apiDelete<T>(path: string): Promise<ApiResult<T>> {
-  const url = buildUrl(path);
-  try {
-    const response = await fetch(url, {
-      method: 'DELETE',
-      headers: buildHeaders(),
-    });
-
-    if (!response.ok) {
-      let errorBody: any = null;
-      try {
-        errorBody = await response.json();
-        if (errorBody && errorBody.status === 401 && errorBody.error === "UNAUTHORIZED" && errorBody.message === 'Token expirado.') {
-          removeStoredToken();
-          return { success: false, status: 401, message: 'Token expirado. Por favor, faça login novamente.', body: errorBody };
-        }
-      } catch (e) {
-        console.warn('Não foi possível parsear o corpo de erro como JSON:', e);
-      }
-      const message = (errorBody && (errorBody.message || errorBody.error)) || response.statusText || `Request failed with status ${response.status}`;
-      return { success: false, status: response.status, message, body: errorBody };
-    }
-
-    // Alguns DELETEs retornam corpo vazio
-    let dataResp: any = null;
-    try {
-      dataResp = await response.json();
-    } catch (e) {
-      dataResp = null;
-    }
-    return { success: true, data: dataResp };
-  } catch (err: any) {
-    console.log('Erro na requisição POST:', err);
-    return falhaNaRequisicao(500, "");
-  }
+export function apiPostLogin<T>(path: string, data: unknown): Promise<ApiResult<T>> {
+  return request<T>(path, 'POST', data, false);
 }
 
-// Adicione outros métodos (DELETE) conforme necessário.
+export function apiPut<T>(path: string, data: unknown): Promise<ApiResult<T>> {
+  return request<T>(path, 'PUT', data);
+}
+
+export function apiDelete<T>(path: string): Promise<ApiResult<T>> {
+  return request<T>(path, 'DELETE');
+}

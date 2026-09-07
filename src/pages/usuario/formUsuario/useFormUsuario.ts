@@ -18,6 +18,7 @@ export default function useFormUsuario() {
     control,
     reset,
     register,
+    setError,
     formState: { errors },
   } = useForm<UsuarioFormSchema>({
     resolver: zodResolver(usuarioFormSchema),
@@ -77,10 +78,19 @@ export default function useFormUsuario() {
   const salvar = async (data: UsuarioFormSchema) => {
     setIsSubmitting(true);
     try {
-      if (query.id) {
-        await update(String(query.id), data);
-      } else {
-        await create(data);
+      const response = query.id
+        ? await update(String(query.id), data)
+        : await create(data);
+
+      if (!response.success) {
+        response.errors.forEach(({ field, message }) => {
+          if (field in usuarioFormDefaultValues) {
+            setError(field as keyof UsuarioFormSchema, {
+              type: 'server',
+              message,
+            });
+          }
+        });
       }
     } catch (error) {
       console.error('Erro ao salvar formulário:', error);

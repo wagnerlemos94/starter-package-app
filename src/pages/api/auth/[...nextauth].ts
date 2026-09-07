@@ -7,7 +7,7 @@ interface ILoginResponse {
   success: true,
   data: {
     token: string,
-    expiresInToken: string,
+    expiresInToken: number,
     nome: string,
     username: string
   }
