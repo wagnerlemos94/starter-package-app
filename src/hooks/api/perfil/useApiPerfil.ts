@@ -1,7 +1,7 @@
 import { ApiResult, apiGet, apiPost, apiPut, apiDelete } from '@/services/api';
 import { useToast } from '@/components/Toast';
 
-const base = 'profile';
+const base = 'perfil';
 
 type UUID = string;
 

@@ -1,7 +1,7 @@
 import { ApiResult, apiGet } from '@/services/api';
 import { useToast } from '@/components/Toast';
 
-const base = 'resource';
+const base = 'recurso';
 
 type UUID = string;
 
