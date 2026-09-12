@@ -1,7 +1,7 @@
 import { ApiResult, apiGet, apiPost, apiPut, apiDelete } from '@/services/api';
 import { useToast } from '@/components/Toast';
 
-const base = 'user';
+const base = 'usuario';
 
 type UUID = string;
 
@@ -15,6 +15,7 @@ export interface IUsuarioRequest {
   cpf: string;
   name: string;
   profileId: UUID;
+  password?: string;
   active: boolean;
 }
 

@@ -74,7 +74,7 @@ O cliente HTTP está em `src/services/api.ts`. Caminhos relativos são combinado
 ```text
 NEXT_PUBLIC_BASE_URL=http://localhost:8085/api
 caminho=user
-URL final=http://localhost:8085/api/user
+URL final=http://localhost:8085/api/usuario
 ```
 
 Nas chamadas protegidas, o token armazenado como `accessToken` no `localStorage` é enviado como Bearer token:
@@ -147,10 +147,10 @@ Páginas ausentes de `src/auth/route-permissions.ts` não recebem controle de pe
 | Domínio | Operações usadas pelo app |
 |---|---|
 | Login | `POST /auth/login` |
-| Usuários | `GET /user`, `GET /user/{id}`, `POST /user`, `PUT /user/{id}`, `DELETE /user/{id}` |
-| Perfis | `GET /profile`, `GET /profile/{id}`, `POST /profile`, `PUT /profile/{id}`, `DELETE /profile/{id}` |
-| Recursos | `GET /resource`, `GET /resource/{id}` |
-| Permissões | `GET /permission`, `GET /permission/{id}` |
+| Usuários | `GET /usuario`, `GET /usuario/{id}`, `POST /usuario`, `PUT /usuario/{id}`, `DELETE /usuario/{id}` |
+| Perfis | `GET /perfil`, `GET /perfil/{id}`, `POST /perfil`, `PUT /perfil/{id}`, `DELETE /perfil/{id}` |
+| Recursos | `GET /recurso`, `GET /recurso/{id}` |
+| Permissões | `GET /permissao`, `GET /permissao/{id}` |
 
 Todos os caminhos são relativos a `NEXT_PUBLIC_BASE_URL`.
 
