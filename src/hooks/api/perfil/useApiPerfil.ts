@@ -37,7 +37,7 @@ export interface IPerfilResponse {
 export const useApiPerfil = () => {
     const { showToast } = useToast();
 
-    const handleErrorToast = (res: ApiResult<any>) => {
+    const handleErrorToast = (res: ApiResult<unknown>) => {
         if (!res) return showToast('Erro desconhecido', 'error');
         if (!res.success) {
             const msg = res.message || (res.body && (res.body.message || res.body.error)) || `Erro: ${res.status}`;

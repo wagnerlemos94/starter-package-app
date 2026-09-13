@@ -42,20 +42,6 @@ export async function proxy(
   }
 
   /*
-   * Descobre a configuração
-   * da rota.
-   */
-  const route =
-    findRoutePermission(pathname);
-
-  /*
-   * Rota sem controle de permissão.
-   */
-  if (!route) {
-    return NextResponse.next();
-  }
-
-  /*
    * Recupera JWT do NextAuth.
    */
   const token = await getToken({
@@ -81,6 +67,12 @@ export async function proxy(
     return NextResponse.redirect(
       loginUrl
     );
+  }
+
+  const route = findRoutePermission(pathname);
+
+  if (!route) {
+    return NextResponse.next();
   }
 
   /*

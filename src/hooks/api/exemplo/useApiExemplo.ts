@@ -29,7 +29,7 @@ export interface IExemploRequest {
 export const useApiExemplo = () => {
   const { showToast } = useToast();
 
-  const handleErrorToast = (res: ApiResult<any>) => {
+  const handleErrorToast = (res: ApiResult<unknown>) => {
     if (!res) {
       showToast('Erro desconhecido', 'error');
       return;

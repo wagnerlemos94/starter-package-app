@@ -9,8 +9,7 @@ import {
 export function usePermission() {
   const { data: session, status } = useSession();
 
-  const resources =
-    (session?.user as any)?.resource;
+  const resources = session?.user.resource;
 
   const checkPermission = (
     resource: string,

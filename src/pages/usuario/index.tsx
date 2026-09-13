@@ -1,7 +1,7 @@
-import DataTable from '@/layout/componets/DataTable';
+import DataTable from '@/layout/components/DataTable';
 import AddIcon from '@mui/icons-material/Add';
 import { IUsuarioResponse } from '@/hooks/api/usuario/useApiUsuario';
-import useUsuario from './useUsuario';
+import useUsuario from '@/features/usuario/useUsuario';
 
 export default function Usuario() {
   const {

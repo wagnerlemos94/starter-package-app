@@ -1,9 +1,9 @@
 import FormComponent from '@/components/FormComponent';
-import useFormUsuario from './useFormUsuario';
+import useFormUsuario from '@/features/usuario/useFormUsuario';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import TextFieldMask from '@/components/TextFieldMask';
-import SelectComponet from '@/components/SelectComponet';
+import SelectComponent from '@/components/SelectComponent';
 import { Controller } from 'react-hook-form';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
@@ -30,19 +30,13 @@ export default function FormUsuario() {
                     }}
                 >
                     <Box sx={{ width: '32%', display: 'flex', m: 1 }}>
-                        <Controller
-                            name="name"
-                            control={control}
-                            render={({ field }) => (
-                                <TextField
-                                    {...register("name")}
-                                    error={!!errors.name}
-                                    helperText={errors.name?.message}
-                                    label="Nome"
-                                    fullWidth
-                                    focused={true}
-                                />
-                            )}
+                        <TextField
+                            {...register("name")}
+                            error={!!errors.name}
+                            helperText={errors.name?.message}
+                            label="Nome"
+                            fullWidth
+                            focused
                         />
                     </Box>
 
@@ -71,10 +65,10 @@ export default function FormUsuario() {
                             name="profileId"
                             control={control}
                             render={({ field }) => (
-                                <SelectComponet
+                                <SelectComponent
                                     name="Perfil"
                                     options={listPerfil.map((item) => ({
-                                        label: item.name,
+                                        label: item.nome,
                                         value: item.id,
                                     }))}
                                     value={field.value}
@@ -83,6 +77,19 @@ export default function FormUsuario() {
                                     helperText={errors.profileId?.message}
                                 />
                             )}
+                        />
+                    </Box>
+
+                    <Box sx={{ width: '32%', display: 'flex', m: 1 }}>
+                        <TextField
+                            {...register('password')}
+                            error={!!errors.password}
+                            helperText={errors.password?.message}
+                            label="Senha"
+                            placeholder="Mínimo de 8 caracteres"
+                            type="password"
+                            fullWidth
+                            focused
                         />
                     </Box>
 

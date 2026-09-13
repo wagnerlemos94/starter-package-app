@@ -2,15 +2,14 @@ import NextAuth from "next-auth";
 import type { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { apiPostLogin } from "../../../services/api";
+import type { ResourcePermissions } from "../../../auth/permissions";
 
 interface ILoginResponse {
-  success: true,
-  data: {
-    token: string,
-    expiresInToken: number,
-    nome: string,
-    username: string
-  }
+  token: string;
+  expiresInToken: number;
+  nome: string;
+  username: string;
+  resource: ResourcePermissions;
 }
 
 export const authOptions: AuthOptions = {
@@ -24,33 +23,20 @@ export const authOptions: AuthOptions = {
       async authorize(credentials) {
         if (!credentials) return null;
         const { cpf, senha } = credentials as { cpf?: string; senha?: string };
-        console.log(cpf, senha)
         try {
-          const response = await apiPostLogin<any>("auth/login", { cpf, password: senha });
-          console.log('Resposta do login:', response);
+          const response = await apiPostLogin<ILoginResponse>("auth/login", { cpf, password: senha });
+          if (!response.success) return null;
 
-          // apiPostLogin retorna ApiResult<T>. O backend pode devolver o payload em
-          // diferentes níveis (por exemplo: { token } ou { data: { token } }).
-          if (!response || !response.success) return null;
-
-          const payload = response.data;
-          // Tentar extrair token flexivelmente
-          const tokenValue = (payload && ((payload.token) ?? (payload.data && payload.data.token))) ?? null;
-          if (!tokenValue) return null;
-
-          const username = (payload && (payload.username ?? payload.data?.username)) ?? "";
-          const nome = (payload && (payload.nome ?? payload.data?.nome)) ?? "";
-          const resource = (payload && (payload.resource ?? payload.data?.resource)) ?? {};
+          const { token, username, nome, resource } = response.data;
 
           return {
             id: username,
             name: nome,
             username,
-            token: tokenValue,
+            accessToken: token,
             resource
           };
-        } catch (err) {
-          console.error("Authorize error:", err);
+        } catch {
           // Em vez de lançar um erro que faz o Next.js retornar uma página HTML
           // (causando o `Unexpected token '<'` no cliente), retornar `null`
           // indica falha na autenticação e faz o cliente receber JSON.
@@ -66,18 +52,20 @@ export const authOptions: AuthOptions = {
     signIn: "/login",
   },
   callbacks: {
-    async jwt({ token, user }: any) {
+    async jwt({ token, user }) {
       if (user) {
-        token.user = user;
-        token.accessToken = user.token;
+        token.username = user.username;
+        token.name = user.name;
+        token.accessToken = user.accessToken;
         token.resource = user.resource;
       }
 
       return token;
     },
-    async session({ session, token }: any) {
-      (session as any).user = (token as any).user;
-      (session as any).accessToken = (token as any).accessToken;
+    async session({ session, token }) {
+      session.user.username = token.username ?? "";
+      session.user.resource = token.resource ?? {};
+      session.accessToken = token.accessToken ?? "";
       return session;
     },
   },

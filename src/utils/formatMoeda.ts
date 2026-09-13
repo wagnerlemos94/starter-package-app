@@ -13,6 +13,5 @@ export const formatToCurrency = (value: string | number) => {
 export const parseCurrencyToNumber = (value: string) => {
   const num = value.replace(/\D/g, "");
   return Number(num);
-  console.log(num);  
 };
 

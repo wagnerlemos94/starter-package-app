@@ -5,9 +5,9 @@ const base = 'usuario';
 
 type UUID = string;
 
-export interface IProfileResponse {
+export interface IPerfilResponse {
   id: UUID;
-  name: string;
+  nome: string;
 }
 
 export interface IUsuarioRequest {
@@ -24,13 +24,13 @@ export interface IUsuarioResponse {
   cpf: string;
   name: string;
   active: boolean | string;
-  profile: IProfileResponse;
+  profile: IPerfilResponse;
 }
 
 export const useApiUsuario = () => {
   const { showToast } = useToast();
 
-  const handleErrorToast = (res: ApiResult<any>) => {
+  const handleErrorToast = (res: ApiResult<unknown>) => {
     if (!res) return showToast('Erro desconhecido', 'error');
     if (!res.success) {
       const msg = res.message || (res.body && (res.body.message || res.body.error)) || `Erro: ${res.status}`;

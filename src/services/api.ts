@@ -1,4 +1,4 @@
-import { signOut } from 'next-auth/react';
+import { getSession, signOut } from 'next-auth/react';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || '';
 const INTERNAL_SERVER_ERROR = 'Erro interno do servidor. Por favor, tente novamente mais tarde.';
@@ -35,21 +35,12 @@ function buildUrl(path: string): string {
   return `${BASE_URL.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
 }
 
-function getStoredToken(): string | null {
-  if (typeof window === 'undefined') return null;
-
-  try {
-    return localStorage.getItem('accessToken');
-  } catch {
-    return null;
-  }
-}
-
-function buildHeaders(authenticated: boolean): HeadersInit {
+async function buildHeaders(authenticated: boolean): Promise<HeadersInit> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
-  const token = authenticated ? getStoredToken() : null;
+  const session = authenticated ? await getSession() : null;
+  const token = session?.accessToken;
 
   if (token) headers.Authorization = `Bearer ${token}`;
   return headers;
@@ -63,7 +54,7 @@ function isApiErrorResponse(value: unknown): value is ApiErrorResponse {
     && typeof body.message === 'string';
 }
 
-async function parseError(response: Response): Promise<ApiResult<never>> {
+async function parseError(response: Response, authenticated: boolean): Promise<ApiResult<never>> {
   let parsedBody: unknown;
 
   try {
@@ -76,8 +67,7 @@ async function parseError(response: Response): Promise<ApiResult<never>> {
     ? { ...parsedBody, errors: Array.isArray(parsedBody.errors) ? parsedBody.errors : [] }
     : undefined;
 
-  if (response.status === 401 && body?.message === 'Token expirado.') {
-    if (typeof window !== 'undefined') localStorage.removeItem('accessToken');
+  if (authenticated && response.status === 401 && typeof window !== 'undefined') {
     await signOut({ callbackUrl: '/login' });
   }
 
@@ -97,8 +87,7 @@ async function parseError(response: Response): Promise<ApiResult<never>> {
   };
 }
 
-function networkError(error: unknown): ApiResult<never> {
-  console.error('Falha ao acessar a API:', error);
+function networkError(): ApiResult<never> {
   return {
     success: false,
     status: 0,
@@ -116,11 +105,11 @@ async function request<T>(
   try {
     const response = await fetch(buildUrl(path), {
       method,
-      headers: buildHeaders(authenticated),
+      headers: await buildHeaders(authenticated),
       body: data === undefined ? undefined : JSON.stringify(data),
     });
 
-    if (!response.ok) return parseError(response);
+    if (!response.ok) return parseError(response, authenticated);
     if (response.status === 204) return { success: true, data: undefined as T };
 
     const text = await response.text();
@@ -128,8 +117,8 @@ async function request<T>(
       success: true,
       data: text ? JSON.parse(text) as T : undefined as T,
     };
-  } catch (error) {
-    return networkError(error);
+  } catch {
+    return networkError();
   }
 }
 

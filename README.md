@@ -56,6 +56,7 @@ Acesse http://localhost:3000.
 | `npm run build` | Gera a versão de produção |
 | `npm run start` | Executa a versão compilada |
 | `npm run lint` | Executa o ESLint |
+| `npm test` | Executa os testes automatizados com Vitest |
 
 ## Docker
 
@@ -73,18 +74,18 @@ O cliente HTTP está em `src/services/api.ts`. Caminhos relativos são combinado
 
 ```text
 NEXT_PUBLIC_BASE_URL=http://localhost:8085/api
-caminho=user
+caminho=usuario
 URL final=http://localhost:8085/api/usuario
 ```
 
-Nas chamadas protegidas, o token armazenado como `accessToken` no `localStorage` é enviado como Bearer token:
+Nas chamadas protegidas, o cliente obtém o `accessToken` da sessão assinada do NextAuth e o envia como Bearer token:
 
 ```http
 Authorization: Bearer <token>
 Content-Type: application/json
 ```
 
-Quando a API informa que o token expirou, o cliente remove o token local e inicia o logout.
+Quando uma chamada protegida recebe `401`, o cliente encerra a sessão e redireciona o usuário para o login. O token não é duplicado no `localStorage`.
 
 ## Autenticação
 
@@ -108,7 +109,7 @@ Resposta esperada:
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiJ9...",
-  "expiresInToken": "",
+  "expiresInToken": 86400000,
   "nome": "Nome do usuário",
   "username": "00000000000",
   "resource": {
@@ -140,7 +141,7 @@ O proxy protege atualmente:
 
 Usuários sem sessão são redirecionados para `/login`. Usuários sem a permissão exigida vão para `/nao-autorizado`, com `resource` e `permission` na URL.
 
-Páginas ausentes de `src/auth/route-permissions.ts` não recebem controle de permissão pelo proxy.
+Todas as páginas privadas exigem uma sessão válida. A matriz em `src/auth/route-permissions.ts` acrescenta a autorização por recurso e operação às rotas administrativas.
 
 ## Endpoints consumidos
 
@@ -162,15 +163,15 @@ O cliente HTTP em `src/services/api.ts` interpreta o contrato padronizado de err
 src/
 ├── auth/             # Recursos, permissões e regras por rota
 ├── components/       # Componentes genéricos
+├── config/           # Identidade e configurações da aplicação
+├── features/         # Estado e regras de apresentação por funcionalidade
 ├── hooks/api/        # Contratos e chamadas por domínio
-├── layout/componets/ # Componentes de layout
+├── layout/components/# Componentes de layout
 ├── pages/            # Páginas e rotas de API do Next.js
 ├── schemas/          # Validações Zod
 ├── services/         # Cliente HTTP e erros
 └── proxy.ts          # Autenticação e autorização
 ```
-
-O diretório `componets` mantém a grafia atual do código.
 
 ## Contratos principais
 
@@ -182,6 +183,7 @@ interface IUsuarioRequest {
   cpf: string;
   name: string;
   profileId: string;
+  password?: string;
   active: boolean;
 }
 ```
@@ -204,10 +206,7 @@ Em `perfilRecurso`, cada chave é o UUID de um recurso e seu valor é a lista de
 
 - Defina um `NEXTAUTH_SECRET` forte e exclusivo por ambiente.
 - Configure `NEXTAUTH_URL` com a URL pública correta.
-- Remova logs de CPF, senha, token e respostas de autenticação.
-- Evite manter o token simultaneamente na sessão e no `localStorage` sem uma estratégia explícita.
-- Adicione todas as páginas privadas à matriz de rotas protegidas.
-- Execute `npm run lint` e `npm run build` na integração contínua.
+- Execute `npm run lint`, `npm test` e `npm run build` na integração contínua.
 - Use uma imagem Docker de produção com build em múltiplos estágios.
 
 ## Documentação da API

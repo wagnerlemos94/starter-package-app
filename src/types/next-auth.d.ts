@@ -4,7 +4,7 @@ declare module "next-auth" {
     id: string;
     name: string;
     username: string;
-    token: string;
+    accessToken: string;
     resource: Record<
       string,
       Array<

@@ -1,6 +1,6 @@
 import React from 'react';
-import DataTable from "@/layout/componets/DataTable";
-import useExemplo, { IExemplo } from "./useExemplo";
+import DataTable from "@/layout/components/DataTable";
+import useExemplo, { IExemplo } from "@/features/exemplo/useExemplo";
 import AddIcon from '@mui/icons-material/Add';
 
 export default function Exemplo() {

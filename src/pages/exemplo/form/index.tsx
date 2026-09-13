@@ -1,18 +1,17 @@
 import { Box, Grid, TextField } from "@mui/material";
 import DatePickerField from "@/components/DatePickerField";
 import TextFieldMask from "@/components/TextFieldMask";
-import useForm from "./useFormExempo";
+import useForm from "@/features/exemplo/useFormExemplo";
 import { Controller } from "react-hook-form";
 import FormComponent from "@/components/FormComponent";
-import SelectComponent from "@/components/SelectComponet";
-import EnderecoForm from "@/layout/componets/EnderecoForm";
-import ContatosForm from "@/layout/componets/ContatosForm";
+import SelectComponent from "@/components/SelectComponent";
+import EnderecoForm from "@/layout/components/EnderecoForm";
+import ContatosForm from "@/layout/components/ContatosForm";
 
 export default function Form() {
     const {
         action: {
             salvar,
-            setOpen
         },
         data: {
             register,
@@ -21,7 +20,6 @@ export default function Form() {
             setValue,
             loading,
             isSubmitting,
-            open,
             optionsResponsavel,
         }
     } = useForm();

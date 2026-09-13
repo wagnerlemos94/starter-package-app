@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import Button from "@/layout/componets/Button";
+import Button from "@/layout/components/Button";
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';

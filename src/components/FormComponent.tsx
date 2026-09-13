@@ -1,8 +1,7 @@
 import { Box, Container, Divider, Typography } from "@mui/material";
 import Loading from "./Loading";
-import Button from "@/layout/componets/Button";
+import Button from "@/layout/components/Button";
 import { useRouter } from "next/router";
-import { theme } from "@/layout/globalStyles/theme";
 
 interface FormComponentProps {
     onSubmit: (e?: React.FormEvent) => void;

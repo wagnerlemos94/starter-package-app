@@ -1,5 +1,5 @@
 import FormComponent from "@/components/FormComponent";
-import useFormPerfil from "./useFormPerfil";
+import useFormPerfil from "@/features/perfil/useFormPerfil";
 
 import {
   Box,

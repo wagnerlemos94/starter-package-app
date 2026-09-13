@@ -1,7 +1,7 @@
-import DataTable from '@/layout/componets/DataTable';
+import DataTable from '@/layout/components/DataTable';
 import AddIcon from '@mui/icons-material/Add';
 import { IPerfilResponse } from '@/hooks/api/perfil/useApiPerfil';
-import usePerfil from './usePerfil';
+import usePerfil from '@/features/perfil/usePerfil';
 
 export default function Perfil() {
   const {

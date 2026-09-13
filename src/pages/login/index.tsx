@@ -1,11 +1,11 @@
-import { useLogin } from "./useLogin";
-import { Box, Button, Container, TextField, Paper, Typography, Grid, FormControlLabel, Checkbox, Link, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton } from "@mui/material";
+import { useLogin } from "@/features/auth/useLogin";
+import { Box, Button, TextField, Paper, Typography, Grid, FormControlLabel, Checkbox, Link, IconButton } from "@mui/material";
 import { Controller } from "react-hook-form";
 import TextFieldMask from "@/components/TextFieldMask";
 import Loading from "@/components/Loading";
 import { theme } from "@/layout/globalStyles/theme";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { appConfig } from "@/constrants";
+import { appConfig } from "@/config/appConfig";
 
 export default function LoginPage() {
 
@@ -30,17 +30,12 @@ export default function LoginPage() {
         <Box sx={{ width: '50%', height: '100%', background: theme.color.primary, color: theme.color.white, p: 6, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-              <Box sx={{ width: 48, height: 48, borderRadius: '50%', background: theme.color.warning, display: 'flex', alignItems: 'center', justifyContent: 'center', color: theme.color.black, fontWeight: 700 }}>🚌</Box>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>Gestão<br />Escolar</Typography>
+              <Box sx={{ width: 48, height: 48, borderRadius: '50%', background: theme.color.warning, display: 'flex', alignItems: 'center', justifyContent: 'center', color: theme.color.black, fontWeight: 700 }}>SP</Box>
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>{appConfig.nomeSistema}</Typography>
             </Box>
-            <Typography variant="body2" sx={{ opacity: 0.9, fontSize: '1.2rem' }}>Plataforma de gerenciamento de transporte escolar.</Typography>
+            <Typography variant="body2" sx={{ opacity: 0.9, fontSize: '1.2rem' }}>{appConfig.description}</Typography>
           </Box>
 
-          <Box sx={{ mt: 4, width: '100%', flexGrow: 1, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-            <Box sx={{ borderRadius: 6 }} >
-              <img src="/img/van.png" style={{ width: '100%', height: "40%", maxWidth: 600, borderRadius: 8 }} />
-            </Box>
-          </Box>
         </Box>
 
         {/* Right panel - form */}
