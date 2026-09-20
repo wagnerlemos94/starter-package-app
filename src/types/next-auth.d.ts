@@ -5,6 +5,7 @@ declare module "next-auth" {
     name: string;
     username: string;
     accessToken: string;
+    accessTokenExpiresAt: number;
     resource: Record<
       string,
       Array<
@@ -19,5 +20,7 @@ declare module "next-auth" {
   interface Session {
     user: User;
     accessToken: string;
+    accessTokenExpiresAt: number;
+    error?: "AccessTokenExpired";
   }
 }

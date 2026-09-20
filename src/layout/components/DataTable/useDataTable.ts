@@ -68,9 +68,15 @@ export const useDataTable = <T extends object>({
         setConfirmOpenStatus(false);
     }
 
-    const modalTitle = typeof action?.delete?.confirmDelete === 'object' && action!.delete!.confirmDelete!.title ? action!.delete!.confirmDelete!.title : 'Confirmar exclusão';
-    const modalConfirmText = typeof action?.delete?.confirmDelete === 'object' && action!.delete!.confirmDelete!.confirmText ? action!.delete!.confirmDelete!.confirmText : 'Excluir';
-    const modalCancelText = typeof action?.delete?.confirmDelete === 'object' && action!.delete!.confirmDelete!.cancelText ? action!.delete!.confirmDelete!.cancelText : 'Cancelar';
+    const deleteConfirmation = typeof action?.delete?.confirmDelete === 'object'
+        ? action.delete.confirmDelete
+        : undefined;
+    const modalTitle = deleteConfirmation?.title ?? 'Confirmar exclusão';
+    const modalDescription = selectedRow && deleteConfirmation?.description
+        ? deleteConfirmation.description(selectedRow)
+        : 'Deseja realmente excluir este item?';
+    const modalConfirmText = deleteConfirmation?.confirmText ?? 'Excluir';
+    const modalCancelText = deleteConfirmation?.cancelText ?? 'Cancelar';
     return {
         action: {
             handleDeleteClick,
@@ -87,6 +93,7 @@ export const useDataTable = <T extends object>({
             modalCancelText,
             modalConfirmText,
             modalTitle,
+            modalDescription,
             confirmOpenDelete,
             confirmOpenStatus,
             rowsPerPage,

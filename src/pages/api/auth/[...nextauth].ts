@@ -3,6 +3,11 @@ import type { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { apiPostLogin } from "../../../services/api";
 import type { ResourcePermissions } from "../../../auth/permissions";
+import {
+  ACCESS_TOKEN_EXPIRED,
+  calculateAccessTokenExpiresAt,
+  isAccessTokenExpired,
+} from "../../../auth/session";
 
 interface ILoginResponse {
   token: string;
@@ -27,13 +32,16 @@ export const authOptions: AuthOptions = {
           const response = await apiPostLogin<ILoginResponse>("auth/login", { cpf, password: senha });
           if (!response.success) return null;
 
-          const { token, username, nome, resource } = response.data;
+          const { token, expiresInToken, username, nome, resource } = response.data;
+          const accessTokenExpiresAt = calculateAccessTokenExpiresAt(expiresInToken);
+          if (!accessTokenExpiresAt) return null;
 
           return {
             id: username,
             name: nome,
             username,
             accessToken: token,
+            accessTokenExpiresAt,
             resource
           };
         } catch {
@@ -57,15 +65,20 @@ export const authOptions: AuthOptions = {
         token.username = user.username;
         token.name = user.name;
         token.accessToken = user.accessToken;
+        token.accessTokenExpiresAt = user.accessTokenExpiresAt;
         token.resource = user.resource;
       }
 
       return token;
     },
     async session({ session, token }) {
+      const expired = isAccessTokenExpired(token.accessTokenExpiresAt);
+
       session.user.username = token.username ?? "";
       session.user.resource = token.resource ?? {};
-      session.accessToken = token.accessToken ?? "";
+      session.accessToken = expired ? "" : token.accessToken ?? "";
+      session.accessTokenExpiresAt = token.accessTokenExpiresAt ?? 0;
+      session.error = expired ? ACCESS_TOKEN_EXPIRED : undefined;
       return session;
     },
   },

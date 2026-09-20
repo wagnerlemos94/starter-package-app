@@ -84,7 +84,7 @@ export default function useFormPerfil() {
     setValue('perfilRecurso', merged, { shouldDirty: false });
   };
 
-  const buscarRecursosEPermissoes = async () => {
+  const buscarRecursosEPermissoes = async (): Promise<IRecursoResponse[]> => {
     try {
       const [resRecursos, resPermissoes] = await Promise.all([
         listRecursosApi(),
@@ -100,12 +100,15 @@ export default function useFormPerfil() {
       if (recursos.length > 0) {
         garantirLinhasRecursos(recursos);
       }
+
+      return recursos;
     } catch {
       showToast('Erro ao buscar recursos e permissões', 'error');
+      return [];
     }
   };
 
-  const buscar = async (id: string) => {
+  const buscar = async (id: string, recursos: IRecursoResponse[]) => {
     setLoading(true);
     try {
       const response = await getById(id);
@@ -118,13 +121,12 @@ export default function useFormPerfil() {
         recurso: { id: pr.recursoId },
         permissoes: pr.permissoes?.map((p) => ({ id: p.id })) || [],
       })));
-      const recursosAtuais = listRecurso.length > 0 ? listRecurso : undefined;
 
       reset({
         nome: response.data.nome,
         descricao: response.data.descricao,
         ativo: !!response.data.ativo,
-        perfilRecurso: mapToArray(perfilMap, recursosAtuais),
+        perfilRecurso: mapToArray(perfilMap, recursos),
       });
     } catch {
       showToast('Erro ao carregar os dados!', 'error');
@@ -134,13 +136,19 @@ export default function useFormPerfil() {
   };
 
   useEffect(() => {
-    void buscarRecursosEPermissoes();
-    if (query.id) {
-      void buscar(String(query.id));
-    }
+    if (!router.isReady) return;
+
+    const carregarFormulario = async () => {
+      const recursos = await buscarRecursosEPermissoes();
+      if (query.id) {
+        await buscar(String(query.id), recursos);
+      }
+    };
+
+    void carregarFormulario();
     // As funções de carga são executadas somente quando o identificador da rota muda.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query.id]);
+  }, [query.id, router.isReady]);
 
   const salvar = async (data: PerfilFormSchema) => {
     setIsSubmitting(true);

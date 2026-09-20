@@ -4,6 +4,7 @@ import {
 } from "next/server";
 
 import { getToken } from "next-auth/jwt";
+import { isAccessTokenExpired } from "./auth/session";
 
 import {
   findRoutePermission,
@@ -52,7 +53,7 @@ export async function proxy(
   /*
    * Usuário não autenticado.
    */
-  if (!token) {
+  if (!token || isAccessTokenExpired(token.accessTokenExpiresAt)) {
     const loginUrl = new URL(
       "/login",
       request.url

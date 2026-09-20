@@ -1,31 +1,29 @@
-# Rodando com Docker
+# Execução com Docker
 
-Comandos rápidos:
+## Produção
 
-Construir imagem (produção):
+Defina `NEXTAUTH_SECRET` no arquivo `.env` e execute:
 
-```
-docker build -t escolar-frontend:latest .
-```
-
-Executar imagem:
-
-```
-docker run -p 3000:3000 --env NODE_ENV=production escolar-frontend:latest
+```bash
+docker compose up --build app
 ```
 
-Usando docker-compose (produção):
+A aplicação estará disponível em `http://localhost:3005`. A imagem executa o build em múltiplos estágios e inicia o Next.js com `npm run start`.
 
-```
-docker-compose up --build web
-```
+Para informar outra URL da API durante o build:
 
-Modo desenvolvimento (com hot-reload):
-
-```
-docker-compose up --build dev
+```bash
+NEXT_PUBLIC_BASE_URL=https://api.exemplo.com/api docker compose up --build app
 ```
 
-Observações:
-- O serviço de produção usa `npm run build` seguido de `npm start`.
-- Se usar variáveis de ambiente, defina-as via `docker run -e NOME=valor` ou em um arquivo `.env` e carregue no compose.
+## Desenvolvimento
+
+O perfil de desenvolvimento utiliza bind mount e hot reload:
+
+```bash
+docker compose --profile dev up --build app-dev
+```
+
+A aplicação estará disponível em `http://localhost:3000`.
+
+As variáveis aceitas estão documentadas em `.env.example`.

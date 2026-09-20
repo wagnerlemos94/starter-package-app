@@ -4,6 +4,7 @@ declare module "next-auth/jwt" {
   interface JWT {
     username?: string;
     accessToken?: string;
+    accessTokenExpiresAt?: number;
     resource?: Record<
       string,
       Array<"VIEW" | "CREATE" | "UPDATE" | "DELETE">

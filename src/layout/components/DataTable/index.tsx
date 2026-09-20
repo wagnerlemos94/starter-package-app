@@ -19,6 +19,7 @@ import { Delete, Edit } from "@mui/icons-material";
 import Button from "../Button";
 import { DataTableProps } from "./types";
 import { useDataTable } from "./useDataTable";
+import { normalizePage } from "./pagination";
 
 
 export function DataTable<T extends object>({ columns, data, className, titulo = "", buttonCadastro, resource, loading = false, action, containerProps, getRowKey }: DataTableProps<T>) {
@@ -39,6 +40,7 @@ export function DataTable<T extends object>({ columns, data, className, titulo =
 			modalCancelText,
 			modalConfirmText,
 			modalTitle,
+			modalDescription,
 			confirmOpenDelete,
 			confirmOpenStatus,
 			rowsPerPage,
@@ -48,8 +50,14 @@ export function DataTable<T extends object>({ columns, data, className, titulo =
 		{ action }
 	);
 
-	const visibleRows = data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+	const currentPage = normalizePage(page, rowsPerPage, data.length);
+	const visibleRows = data.slice(currentPage * rowsPerPage, currentPage * rowsPerPage + rowsPerPage);
 	const readValue = (row: T, key: string | keyof T): unknown => Reflect.get(row, String(key));
+	const readRowKey = (row: T, index: number): React.Key => {
+		const id = Reflect.get(row, 'id');
+		return getRowKey?.(row, index)
+			?? (typeof id === 'string' || typeof id === 'number' ? id : currentPage * rowsPerPage + index);
+	};
 
 	return (
 		<Container maxWidth={'xl'} sx={{ py: { xs: 2, md: 4 } }}>
@@ -103,13 +111,13 @@ export function DataTable<T extends object>({ columns, data, className, titulo =
 						<TableBody>
 							{data.length === 0 ? (
 								<TableRow style={{ height: '60vh' }}>
-									<TableCell colSpan={columns.length} align="center" style={{ height: '60vh', verticalAlign: 'middle' }}>
+									<TableCell colSpan={columns.length + (action ? 1 : 0)} align="center" style={{ height: '60vh', verticalAlign: 'middle' }}>
 										Nenhum dado encontrado
 									</TableCell>
 								</TableRow>
 							) : (
 								visibleRows.map((row: T, idx) => (
-									<TableRow key={getRowKey?.(row, idx) ?? page * rowsPerPage + idx} hover>
+									<TableRow key={readRowKey(row, idx)} hover>
 										{columns.map((col) => (
 											<TableCell key={String(col.key)}>
 												{col.render ? col.render(readValue(row, col.key), row) : String(readValue(row, col.key) ?? '')}
@@ -140,7 +148,7 @@ export function DataTable<T extends object>({ columns, data, className, titulo =
 					open={confirmOpenDelete}
 					setOpen={setConfirmOpenDelete}
 					title={modalTitle}
-					description={'Deseja realmente excluir este item?'}
+					description={modalDescription}
 					confirmText={modalConfirmText}
 					cancelText={modalCancelText}
 					onConfirm={handleConfirmDelete}
@@ -159,9 +167,12 @@ export function DataTable<T extends object>({ columns, data, className, titulo =
 					component="div"
 					count={data.length}
 					rowsPerPage={rowsPerPage}
-					page={page}
-					onPageChange={(e, page) => { setPage(page) }}
-					onRowsPerPageChange={(e) => { setRowsPerPage(parseInt(e.target.value, 10)) }}
+					page={currentPage}
+					onPageChange={(_event, nextPage) => { setPage(nextPage) }}
+					onRowsPerPageChange={(event) => {
+						setRowsPerPage(parseInt(event.target.value, 10));
+						setPage(0);
+					}}
 				/>
 			</TableContainer>
 		</Container>

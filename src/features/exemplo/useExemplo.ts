@@ -74,7 +74,11 @@ export default function useExemplo() {
     };
 
     useEffect(() => {
-        void buscarLista();
+        const carregarLista = async () => {
+            await buscarLista();
+        };
+
+        void carregarLista();
         // A listagem de demonstração deve ser carregada uma vez na montagem.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);

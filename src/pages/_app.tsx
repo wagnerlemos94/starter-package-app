@@ -4,23 +4,29 @@ import { ToastProvider } from "@/components/Toast";
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import type { Session } from "next-auth";
-import { SessionProvider, useSession } from "next-auth/react";
+import { SessionProvider, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import 'leaflet/dist/leaflet.css';
 
 function AuthGate({ children }: { children: React.ReactNode }) {
-  const { status } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
 
-  const shouldRedirect = status === "unauthenticated" && router.pathname !== "/login";
+  const sessionExpired = session?.error === "AccessTokenExpired";
+  const shouldRedirect = (status === "unauthenticated" || sessionExpired)
+    && router.pathname !== "/login";
 
   useEffect(() => {
     if (status === "loading") return;
+    if (sessionExpired) {
+      void signOut({ callbackUrl: "/login" });
+      return;
+    }
     if (shouldRedirect) {
       void router.replace("/login");
     }
-  }, [router, shouldRedirect, status]);
+  }, [router, sessionExpired, shouldRedirect, status]);
 
   if (status === "loading" || shouldRedirect) return null;
   return <>{children}</>;

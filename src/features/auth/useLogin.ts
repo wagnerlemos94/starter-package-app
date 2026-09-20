@@ -5,6 +5,7 @@ import { signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { getSafeCallbackUrl } from "@/auth/session";
 
 export const useLogin = () => {
 
@@ -44,7 +45,7 @@ export const useLogin = () => {
                 showToast("Usuário ou senha incorretos.", "error");
                 return;
             }
-            await router.push("/");
+            await router.push(getSafeCallbackUrl(router.query.callbackUrl));
         } catch {
             showToast("Erro ao Logar. Tente novamente.", "error");
         } finally {

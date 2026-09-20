@@ -6,11 +6,6 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   {
-    rules: {
-      "react-hooks/set-state-in-effect": "off",
-    },
-  },
-  {
     files: [
       "src/components/DatePickerField.tsx",
       "src/components/SelectComponent.tsx",

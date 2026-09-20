@@ -60,13 +60,13 @@ Acesse http://localhost:3000.
 
 ## Docker
 
-O Docker Compose publica a aplicação na porta `3005`:
+O Docker Compose publica a imagem de produção na porta `3005`:
 
 ```bash
 docker compose up --build
 ```
 
-Acesse http://localhost:3005. O compose usa bind mount e `npm run dev`, sendo voltado ao desenvolvimento.
+Acesse http://localhost:3005. Para executar com hot reload, use `docker compose --profile dev up --build app-dev`. Os detalhes estão em `README.docker.md`.
 
 ## Integração com a API
 
@@ -119,7 +119,7 @@ Resposta esperada:
 }
 ```
 
-O callback JWT guarda o usuário, o token da API e o mapa `resource` na sessão do NextAuth.
+O callback JWT guarda o usuário, o token da API, sua expiração e o mapa `resource` na sessão do NextAuth. Quando o prazo informado em `expiresInToken` termina, o proxy rejeita a sessão e o cliente realiza logout.
 
 ## Autorização
 
@@ -207,7 +207,7 @@ Em `perfilRecurso`, cada chave é o UUID de um recurso e seu valor é a lista de
 - Defina um `NEXTAUTH_SECRET` forte e exclusivo por ambiente.
 - Configure `NEXTAUTH_URL` com a URL pública correta.
 - Execute `npm run lint`, `npm test` e `npm run build` na integração contínua.
-- Use uma imagem Docker de produção com build em múltiplos estágios.
+- Mantenha `NEXT_PUBLIC_BASE_URL` definido durante o build da imagem Docker, pois variáveis públicas são incorporadas ao bundle do navegador.
 
 ## Documentação da API
 

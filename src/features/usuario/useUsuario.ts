@@ -60,7 +60,11 @@ const useUsuario = () => {
   };
 
   useEffect(() => {
-    void buscarUsuarios();
+    const carregarUsuarios = async () => {
+      await buscarUsuarios();
+    };
+
+    void carregarUsuarios();
     // A listagem deve ser carregada uma vez na montagem da página.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

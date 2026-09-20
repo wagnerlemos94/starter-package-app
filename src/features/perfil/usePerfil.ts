@@ -44,7 +44,7 @@ const usePerfil = () => {
       if (response && response.success) {
         setListPerfil(response.data.map((item: IPerfilResponse) => ({
           ...item,
-          active: item.ativo ? 'Ativo' : 'Inativo',
+          ativo: item.ativo ? 'Ativo' : 'Inativo',
         })) || []);
       }
       return response;
@@ -56,7 +56,11 @@ const usePerfil = () => {
   };
 
   useEffect(() => {
-    void buscarPerfis();
+    const carregarPerfis = async () => {
+      await buscarPerfis();
+    };
+
+    void carregarPerfis();
     // A listagem deve ser carregada uma vez na montagem da página.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

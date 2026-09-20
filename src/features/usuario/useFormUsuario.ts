@@ -70,13 +70,19 @@ export default function useFormUsuario() {
   };
 
   useEffect(() => {
-    void buscarPerfis();
-    if (query.id) {
-      void buscar(String(query.id));
-    }
+    if (!router.isReady) return;
+
+    const carregarFormulario = async () => {
+      await buscarPerfis();
+      if (query.id) {
+        await buscar(String(query.id));
+      }
+    };
+
+    void carregarFormulario();
     // As funções de carga são executadas somente quando o identificador da rota muda.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query.id]);
+  }, [query.id, router.isReady]);
 
   const salvar = async (data: UsuarioFormSchema) => {
     if (!query.id && !data.password) {
