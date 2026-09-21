@@ -16,7 +16,7 @@ const useUsuario = () => {
     {
       key: 'profile',
       label: 'Perfil',
-      render: (_value: unknown, row: IUsuarioResponse) => row.profile?.nome ?? '-',
+      render: (_value: unknown, row: IUsuarioResponse) => row.profile ?? '-',
     },
   ];
 

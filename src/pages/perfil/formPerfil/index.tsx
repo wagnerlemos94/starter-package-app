@@ -11,6 +11,7 @@ import {
   Paper,
   Grid,
   Divider,
+  Alert,
 } from "@mui/material";
 
 import { Controller } from "react-hook-form";
@@ -18,7 +19,7 @@ import { theme } from "@/layout/globalStyles/theme";
 
 export default function FormPerfil() {
   const {
-    action: { salvar, register },
+    action: { salvar },
     data: {
       isSubmitting,
       errors,
@@ -47,15 +48,17 @@ export default function FormPerfil() {
             <Controller
               name="nome"
               control={control}
-              render={() => (
+              render={({ field: { ref, ...field } }) => (
                 <TextField
+                  {...field}
+                  inputRef={ref}
+                  onChange={(event) => field.onChange(event.target.value.toUpperCase())}
                   error={!!errors.nome}
                   helperText={errors.nome?.message}
                   label="Nome"
                   placeholder="Nome do perfil"
                   fullWidth
                   size="small"
-                  {...register("nome")}
                 />
               )}
             />
@@ -65,9 +68,10 @@ export default function FormPerfil() {
             <Controller
               name="descricao"
               control={control}
-              render={() => (
+              render={({ field: { ref, ...field } }) => (
                 <TextField
-                  {...register("descricao")}
+                  {...field}
+                  inputRef={ref}
                   error={!!errors.descricao}
                   helperText={errors.descricao?.message}
                   label="Descrição"
@@ -132,6 +136,11 @@ export default function FormPerfil() {
         </Typography>
 
         {/* Recursos */}
+        {(errors.perfilRecurso?.message || errors.perfilRecurso?.root?.message) && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {errors.perfilRecurso?.message || errors.perfilRecurso?.root?.message}
+          </Alert>
+        )}
         <Grid container spacing={2}>
           {perfilRecurso.map((item, index) => {
             const recurso = listRecurso.find(

@@ -5,11 +5,6 @@ const base = 'usuario';
 
 type UUID = string;
 
-export interface IPerfilResponse {
-  id: UUID;
-  nome: string;
-}
-
 export interface IUsuarioRequest {
   id?: UUID;
   cpf: string;
@@ -24,7 +19,8 @@ export interface IUsuarioResponse {
   cpf: string;
   name: string;
   active: boolean | string;
-  profile: IPerfilResponse;
+  profile: string;
+  profileId: UUID;
 }
 
 export const useApiUsuario = () => {

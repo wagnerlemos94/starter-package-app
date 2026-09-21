@@ -29,14 +29,23 @@ export default function FormUsuario() {
                         flexWrap: 'wrap',
                     }}
                 >
-                    <Box sx={{ width: '32%', display: 'flex', m: 1 }}>
-                        <TextField
-                            {...register("name")}
-                            error={!!errors.name}
-                            helperText={errors.name?.message}
-                            label="Nome"
-                            fullWidth
-                            focused
+                    <Box sx={{ width: '32%', display: 'flex', m: 1 }}>              
+                        <Controller
+                            name="name"
+                            control={control}
+                            render={({ field: { ref, ...field } }) => (
+                                <TextField
+                                    {...field}
+                                    inputRef={ref}
+                                    onChange={(event) => field.onChange(event.target.value)}
+                                    error={!!errors.name}
+                                    helperText={errors.name?.message}
+                                    label="Nome"
+                                    placeholder="Nome do perfil"
+                                    fullWidth
+                                    size="small"
+                                />
+                            )}
                         />
                     </Box>
 
@@ -68,7 +77,7 @@ export default function FormUsuario() {
                                 <SelectComponent
                                     name="Perfil"
                                     options={listPerfil.map((item) => ({
-                                        label: item.nome,
+                                        label: item.nome.toUpperCase(),
                                         value: item.id,
                                     }))}
                                     value={field.value}
@@ -83,6 +92,7 @@ export default function FormUsuario() {
                     <Box sx={{ width: '32%', display: 'flex', m: 1 }}>
                         <TextField
                             {...register('password')}
+                            slotProps={{ inputLabel: { shrink: true } }}
                             error={!!errors.password}
                             helperText={errors.password?.message}
                             label="Senha"

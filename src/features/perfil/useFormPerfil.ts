@@ -123,7 +123,7 @@ export default function useFormPerfil() {
       })));
 
       reset({
-        nome: response.data.nome,
+        nome: response.data.nome.toUpperCase(),
         descricao: response.data.descricao,
         ativo: !!response.data.ativo,
         perfilRecurso: mapToArray(perfilMap, recursos),

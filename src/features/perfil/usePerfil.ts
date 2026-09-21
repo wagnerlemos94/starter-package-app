@@ -11,7 +11,6 @@ const usePerfil = () => {
 
   const columns = [
     { key: 'nome', label: 'Nome' },
-    { key: 'chave', label: 'Key' },
     { key: 'descricao', label: 'Descrição' },
     { key: 'ativo', label: 'Status' },
   ];
@@ -44,6 +43,7 @@ const usePerfil = () => {
       if (response && response.success) {
         setListPerfil(response.data.map((item: IPerfilResponse) => ({
           ...item,
+          nome: item.nome.toUpperCase(),
           ativo: item.ativo ? 'Ativo' : 'Inativo',
         })) || []);
       }

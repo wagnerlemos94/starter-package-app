@@ -41,6 +41,7 @@ export default function Form() {
                             placeholder="Nome completo"
                             fullWidth
                             {...register("nome")}
+                            slotProps={{ inputLabel: { shrink: true } }}
                         />
                     </Grid>
 
@@ -88,6 +89,7 @@ export default function Form() {
                             placeholder="00.000.000-0"
                             fullWidth
                             {...register("rg")}
+                            slotProps={{ inputLabel: { shrink: true } }}
                         />
                     </Grid>
 

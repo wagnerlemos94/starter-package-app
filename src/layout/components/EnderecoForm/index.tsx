@@ -35,7 +35,6 @@ type EnderecoFormProps<
 export default function EnderecoForm<
   TFieldValues extends Record<string, any> = Record<string, any>,
 >({
-  register,
   errors,
   control,
   setValue,
@@ -140,8 +139,11 @@ export default function EnderecoForm<
           <Controller
             name={`${namePrefix}.numero` as any}
             control={control}
-            render={() => (
+            render={({ field: { ref, ...field } }) => (
               <TextField
+                {...field}
+                inputRef={ref}
+                value={field.value ?? ""}
                 id="outlined-numero"
                 label="Número"
                 placeholder="Número"
@@ -149,7 +151,6 @@ export default function EnderecoForm<
                 size="small"
                 error={!!getError("numero")}
                 helperText={getError("numero")?.message}
-                {...register(`${namePrefix}.numero` as any)}
               />
             )}
           />
@@ -160,8 +161,11 @@ export default function EnderecoForm<
           <Controller
             name={`${namePrefix}.complemento` as any}
             control={control}
-            render={() => (
+            render={({ field: { ref, ...field } }) => (
               <TextField
+                {...field}
+                inputRef={ref}
+                value={field.value ?? ""}
                 id="outlined-complemento"
                 label="Complemento"
                 placeholder="Apto, bloco..."
@@ -169,7 +173,6 @@ export default function EnderecoForm<
                 size="small"
                 error={!!getError("complemento")}
                 helperText={getError("complemento")?.message}
-                {...register(`${namePrefix}.complemento` as any)}
               />
             )}
           />

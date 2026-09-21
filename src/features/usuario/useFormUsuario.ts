@@ -58,7 +58,7 @@ export default function useFormUsuario() {
       reset({
         cpf: response.data.cpf,
         name: response.data.name,
-        profileId: response.data.profile?.id ?? '',
+        profileId: response.data.profileId ?? '',
         password: '',
         active: !!response.data.active,
       });
