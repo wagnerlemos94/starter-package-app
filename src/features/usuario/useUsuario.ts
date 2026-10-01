@@ -1,10 +1,14 @@
 import { useToast } from '@/components/Toast';
 import { IUsuarioResponse, useApiUsuario } from '@/hooks/api/usuario/useApiUsuario';
 import router from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const useUsuario = () => {
   const [listUsuario, setListUsuario] = useState<IUsuarioResponse[]>([]);
+  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(10);
+  const [totalElements, setTotalElements] = useState(0);
+  const requestId = useRef(0);
   const [loading, setLoading] = useState<boolean>(false);
   const { showToast } = useToast();
   const { list, remove } = useApiUsuario();
@@ -25,7 +29,7 @@ const useUsuario = () => {
       try {
         const res = await remove(String(t.id));
         if (res && res.success) {
-          setListUsuario((prev) => prev.filter((item) => item.id !== t.id));
+          await buscarUsuarios();
           showToast('Usuário removido com sucesso', 'success');
         }
       } catch {
@@ -42,11 +46,16 @@ const useUsuario = () => {
   };
 
   const buscarUsuarios = async () => {
+    const currentRequest = ++requestId.current;
     setLoading(true);
     try {
-      const response = await list();
+      const response = await list({ page, size });
+      if (currentRequest !== requestId.current) return response;
       if (response && response.success) {
-        setListUsuario(response.data.map((item: IUsuarioResponse) => ({
+        setTotalElements(response.data.totalElements);
+        const lastPage = Math.max(0, response.data.totalPages - 1);
+        if (page > lastPage) { setPage(lastPage); return response; }
+        setListUsuario(response.data.content.map((item: IUsuarioResponse) => ({
           ...item,
           active: item.active ? 'Ativo' : 'Inativo',
         })) || []);
@@ -55,7 +64,7 @@ const useUsuario = () => {
     } catch {
       showToast('Erro ao buscar usuários', 'error');
     } finally {
-      setLoading(false);
+      if (currentRequest === requestId.current) setLoading(false);
     }
   };
 
@@ -65,9 +74,9 @@ const useUsuario = () => {
     };
 
     void carregarUsuarios();
-    // A listagem deve ser carregada uma vez na montagem da página.
+    return () => { requestId.current += 1; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [page, size]);
 
   return {
     action: {
@@ -78,6 +87,7 @@ const useUsuario = () => {
     },
     data: {
       listUsuario,
+      pagination: { page, rowsPerPage: size, totalElements, onPageChange: setPage, onRowsPerPageChange: (value: number) => { setSize(value); setPage(0); } },
       columns,
       loading,
     },

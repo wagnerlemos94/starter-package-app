@@ -1,4 +1,4 @@
-import { ApiResult, apiGet } from '@/services/api';
+import { PageRequest, PageResponse, ApiResult, apiGet } from '@/services/api';
 import { useToast } from '@/components/Toast';
 
 const base = 'recurso';
@@ -23,9 +23,9 @@ export const useApiRecurso = () => {
       showToast(msg, 'error');
     }
   };
-
-  const list = async (): Promise<ApiResult<IRecursoResponse[]>> => {
-    const res = await apiGet<IRecursoResponse[]>(`${base}`);
+  const list = async ({ page = 0, size = 10 }: PageRequest = {}): Promise<ApiResult<PageResponse<IRecursoResponse>>> => {
+    const params = new URLSearchParams({ page: String(page), size: String(size) });
+    const res = await apiGet<PageResponse<IRecursoResponse>>(`${base}?${params}`);
     if (!res.success) handleErrorToast(res);
     return res;
   };
@@ -35,6 +35,7 @@ export const useApiRecurso = () => {
     if (!res.success) handleErrorToast(res);
     return res;
   };
+
 
   return { list, getById };
 };

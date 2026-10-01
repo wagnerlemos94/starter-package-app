@@ -87,12 +87,12 @@ export default function useFormPerfil() {
   const buscarRecursosEPermissoes = async (): Promise<IRecursoResponse[]> => {
     try {
       const [resRecursos, resPermissoes] = await Promise.all([
-        listRecursosApi(),
-        listPermissoesApi(),
+        listRecursosApi({ page: 0, size: 20 }),
+        listPermissoesApi({ page: 0, size: 20 }),
       ]);
 
-      const recursos = resRecursos.success ? resRecursos.data || [] : [];
-      const permissoes = resPermissoes.success ? resPermissoes.data || [] : [];
+      const recursos = resRecursos.success ? resRecursos.data.content : [];
+      const permissoes = resPermissoes.success ? resPermissoes.data.content : [];
 
       setListRecurso(recursos);
       setListPermissao(permissoes);

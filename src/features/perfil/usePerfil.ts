@@ -1,10 +1,14 @@
 import { useToast } from '@/components/Toast';
 import { IPerfilResponse, useApiPerfil } from '@/hooks/api/perfil/useApiPerfil';
 import router from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const usePerfil = () => {
   const [listPerfil, setListPerfil] = useState<IPerfilResponse[]>([]);
+  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(10);
+  const [totalElements, setTotalElements] = useState(0);
+  const requestId = useRef(0);
   const [loading, setLoading] = useState<boolean>(false);
   const { showToast } = useToast();
   const { list, remove } = useApiPerfil();
@@ -20,7 +24,7 @@ const usePerfil = () => {
       try {
         const res = await remove(String(t.id));
         if (res && res.success) {
-          setListPerfil((prev) => prev.filter((item) => item.id !== t.id));
+          await buscarPerfis();
           showToast('Perfil removido com sucesso', 'success');
         }
       } catch {
@@ -37,11 +41,16 @@ const usePerfil = () => {
   };
 
   const buscarPerfis = async () => {
+    const currentRequest = ++requestId.current;
     setLoading(true);
     try {
-      const response = await list();
+      const response = await list({ page, size });
+      if (currentRequest !== requestId.current) return response;
       if (response && response.success) {
-        setListPerfil(response.data.map((item: IPerfilResponse) => ({
+        setTotalElements(response.data.totalElements);
+        const lastPage = Math.max(0, response.data.totalPages - 1);
+        if (page > lastPage) { setPage(lastPage); return response; }
+        setListPerfil(response.data.content.map((item: IPerfilResponse) => ({
           ...item,
           nome: item.nome.toUpperCase(),
           ativo: item.ativo ? 'Ativo' : 'Inativo',
@@ -51,7 +60,7 @@ const usePerfil = () => {
     } catch {
       showToast('Erro ao buscar perfis', 'error');
     } finally {
-      setLoading(false);
+      if (currentRequest === requestId.current) setLoading(false);
     }
   };
 
@@ -61,9 +70,9 @@ const usePerfil = () => {
     };
 
     void carregarPerfis();
-    // A listagem deve ser carregada uma vez na montagem da página.
+    return () => { requestId.current += 1; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [page, size]);
 
   return {
     action: {
@@ -74,6 +83,7 @@ const usePerfil = () => {
     },
     data: {
       listPerfil,
+      pagination: { page, rowsPerPage: size, totalElements, onPageChange: setPage, onRowsPerPageChange: (value: number) => { setSize(value); setPage(0); } },
       columns,
       loading,
     },

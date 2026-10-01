@@ -6,7 +6,7 @@ import usePerfil from '@/features/perfil/usePerfil';
 export default function Perfil() {
   const {
     action: { edit },
-    data: { listPerfil, columns, loading },
+    data: { listPerfil, columns, loading, pagination },
   } = usePerfil();
 
   return (
@@ -17,6 +17,7 @@ export default function Perfil() {
         columns={columns}
         data={listPerfil}
         loading={loading}
+        pagination={pagination}
         buttonCadastro={
           {
             nome: 'novo',

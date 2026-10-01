@@ -157,6 +157,24 @@ Todos os caminhos são relativos a `NEXT_PUBLIC_BASE_URL`.
 
 O cliente HTTP em `src/services/api.ts` interpreta o contrato padronizado de erros da API. O resultado de falha contém `message`, `status`, `errorId` no corpo e a lista `errors`. No formulário de usuário, erros associados a campos são exibidos diretamente nos respectivos controles do React Hook Form.
 
+## Paginação e contrato das listagens
+
+Os hooks `useApiUsuario`, `useApiPerfil`, `useApiRecurso` e `useApiPermissao` usam o método `list` existente, com parâmetros opcionais:
+
+```ts
+const response = await list({ page: 0, size: 20 });
+if (response.success) {
+  const registros = response.data.content;
+  const total = response.data.totalElements;
+}
+```
+
+Sem parâmetros, `list()` usa a página 0 com 10 registros. O retorno é sempre `ApiResult<PageResponse<T>>`: o formato `success`, `data` e os campos de erro do cliente HTTP é preservado. `PageRequest` e `PageResponse` estão em `src/services/api.ts`; cada hook chama `apiGet` diretamente.
+
+As tabelas de usuários e perfis consultam o servidor ao trocar de página ou de tamanho (10, 25 ou 50 registros). `DataTable` recebe `pagination` com a página, o tamanho, o total e os callbacks; nesse modo, exibe os registros recebidos sem aplicar um segundo recorte local. Respostas de consultas antigas são ignoradas e, se a página deixar de existir após uma exclusão, a listagem retorna à última página disponível. Sem `pagination`, a tabela mantém a paginação local.
+
+Os formulários de usuário e perfil consultam apenas a primeira página com 20 registros para as opções de perfis, recursos e permissões. Eles não percorrem todas as páginas. Se um caso precisar de uma lista completa, implemente uma consulta sem paginação específica para esse caso.
+
 ## Estrutura principal
 
 ```text

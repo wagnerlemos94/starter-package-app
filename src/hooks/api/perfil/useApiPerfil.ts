@@ -1,4 +1,4 @@
-import { ApiResult, apiGet, apiPost, apiPut, apiDelete } from '@/services/api';
+import { PageRequest, PageResponse, ApiResult, apiGet, apiPost, apiPut, apiDelete } from '@/services/api';
 import { useToast } from '@/components/Toast';
 
 const base = 'perfil';
@@ -44,11 +44,11 @@ export const useApiPerfil = () => {
             showToast(msg, 'error');
         }
     };
-
-    const list = async (): Promise<ApiResult<IPerfilResponse[]>> => {
-        const res = await apiGet<IPerfilResponse[]>(`${base}`);
-        if (!res.success) handleErrorToast(res);
-        return res;
+    const list = async ({ page = 0, size = 10 }: PageRequest = {}): Promise<ApiResult<PageResponse<IPerfilResponse>>> => {
+      const params = new URLSearchParams({ page: String(page), size: String(size) });
+      const res = await apiGet<PageResponse<IPerfilResponse>>(`${base}?${params}`);
+      if (!res.success) handleErrorToast(res);
+      return res;
     };
 
     const getById = async (id: string): Promise<ApiResult<IPerfilResponse>> => {
@@ -78,7 +78,8 @@ export const useApiPerfil = () => {
         return res;
     };
 
-    return { list, getById, create, update, remove };
+
+  return { list, getById, create, update, remove };
 };
 
 export default useApiPerfil;

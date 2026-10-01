@@ -6,7 +6,7 @@ import useUsuario from '@/features/usuario/useUsuario';
 export default function Usuario() {
   const {
     action: { edit },
-    data: { listUsuario, columns, loading },
+    data: { listUsuario, columns, loading, pagination },
   } = useUsuario();
 
   return (
@@ -17,6 +17,7 @@ export default function Usuario() {
         columns={columns}
         data={listUsuario}
         loading={loading}
+        pagination={pagination}
         buttonCadastro={{
           nome: 'novo',
           icon: <AddIcon sx={{ marginRight: 1 }} />,

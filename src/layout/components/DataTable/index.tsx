@@ -15,14 +15,14 @@ import {
 import Link from "next/link";
 import Loading from "@/components/Loading";
 import ConfirmModal from '@/components/ConfirmModal';
-import { Delete, Edit } from "@mui/icons-material";
+import { Delete, EditDocument } from "@mui/icons-material";
 import Button from "../Button";
 import { DataTableProps } from "./types";
 import { useDataTable } from "./useDataTable";
 import { normalizePage } from "./pagination";
 
 
-export function DataTable<T extends object>({ columns, data, className, titulo = "", buttonCadastro, resource, loading = false, action, containerProps, getRowKey }: DataTableProps<T>) {
+export function DataTable<T extends object>({ columns, data, className, titulo = "", buttonCadastro, resource, loading = false, action, containerProps, getRowKey, pagination }: DataTableProps<T>) {
 
 	const {
 		action: {
@@ -50,13 +50,14 @@ export function DataTable<T extends object>({ columns, data, className, titulo =
 		{ action }
 	);
 
-	const currentPage = normalizePage(page, rowsPerPage, data.length);
-	const visibleRows = data.slice(currentPage * rowsPerPage, currentPage * rowsPerPage + rowsPerPage);
+	const pageSize = pagination?.rowsPerPage ?? rowsPerPage;
+	const currentPage = pagination?.page ?? normalizePage(page, pageSize, data.length);
+	const visibleRows = pagination ? data : data.slice(currentPage * pageSize, currentPage * pageSize + pageSize);
 	const readValue = (row: T, key: string | keyof T): unknown => Reflect.get(row, String(key));
 	const readRowKey = (row: T, index: number): React.Key => {
 		const id = Reflect.get(row, 'id');
 		return getRowKey?.(row, index)
-			?? (typeof id === 'string' || typeof id === 'number' ? id : currentPage * rowsPerPage + index);
+			?? (typeof id === 'string' || typeof id === 'number' ? id : currentPage * pageSize + index);
 	};
 
 	return (
@@ -126,7 +127,7 @@ export function DataTable<T extends object>({ columns, data, className, titulo =
 										{action && (hasPermission(resource, 'UPDATE') || hasPermission(resource, 'DELETE')) && (
 											<TableCell>
 												{action.edit && hasPermission(resource, 'UPDATE') && (
-													<Button_M disabled={action.edit.disabled?.(row)} size="small" color="primary" onClick={() => action?.edit?.onChange(row)}><Edit fontSize="small" /></Button_M>
+													<Button_M disabled={action.edit.disabled?.(row)} size="small" color="primary" onClick={() => action?.edit?.onChange(row)}><EditDocument fontSize="small" /></Button_M>
 												)}
 												{action.status && hasPermission(resource, 'UPDATE') && (
 													<Button_M disabled={action.status.disabled?.(row)} size="small" onClick={() => handleInativarClick(row)}><Switch color="success" checked={action.status.checked(row)}></Switch></Button_M>
@@ -165,11 +166,12 @@ export function DataTable<T extends object>({ columns, data, className, titulo =
 				<TablePagination
 					rowsPerPageOptions={[10, 25, 50]}
 					component="div"
-					count={data.length}
-					rowsPerPage={rowsPerPage}
+					count={pagination?.totalElements ?? data.length}
+					rowsPerPage={pageSize}
 					page={currentPage}
-					onPageChange={(_event, nextPage) => { setPage(nextPage) }}
+					onPageChange={(_event, nextPage) => { if (pagination) pagination.onPageChange(nextPage); else setPage(nextPage); }}
 					onRowsPerPageChange={(event) => {
+						if (pagination) { pagination.onRowsPerPageChange(parseInt(event.target.value, 10)); return; }
 						setRowsPerPage(parseInt(event.target.value, 10));
 						setPage(0);
 					}}

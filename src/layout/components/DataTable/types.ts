@@ -18,6 +18,13 @@ export type DataTableProps<T> = {
         redirect?: string;
     };
     loading?: boolean;
+    pagination?: {
+        page: number;
+        rowsPerPage: number;
+        totalElements: number;
+        onPageChange: (page: number) => void;
+        onRowsPerPageChange: (size: number) => void;
+    };
     getRowKey?: (row: T, index: number) => React.Key;
     action?: {
         edit?: {

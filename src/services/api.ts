@@ -3,6 +3,19 @@ import { getSession, signOut } from 'next-auth/react';
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || '';
 const INTERNAL_SERVER_ERROR = 'Erro interno do servidor. Por favor, tente novamente mais tarde.';
 
+export interface PageRequest {
+  page?: number;
+  size?: number;
+}
+
+export interface PageResponse<T> {
+  content: T[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
+
 export interface ApiFieldError {
   field: string;
   message: string;

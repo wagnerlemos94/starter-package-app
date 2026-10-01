@@ -37,9 +37,9 @@ export default function useFormUsuario() {
 
   const buscarPerfis = async () => {
     try {
-      const response = await listPerfilApi();
-      if (response && response.success) {
-        setListPerfil(response.data || []);
+      const response = await listPerfilApi({ page: 0, size: 20 });
+      if (response.success) {
+        setListPerfil(response.data.content);
       }
     } catch {
       showToast('Erro ao buscar perfis', 'error');

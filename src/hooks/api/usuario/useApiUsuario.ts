@@ -1,4 +1,4 @@
-import { ApiResult, apiGet, apiPost, apiPut, apiDelete } from '@/services/api';
+import { PageRequest, PageResponse, ApiResult, apiGet, apiPost, apiPut, apiDelete } from '@/services/api';
 import { useToast } from '@/components/Toast';
 
 const base = 'usuario';
@@ -33,9 +33,9 @@ export const useApiUsuario = () => {
       showToast(msg, 'error');
     }
   };
-
-  const list = async (): Promise<ApiResult<IUsuarioResponse[]>> => {
-    const res = await apiGet<IUsuarioResponse[]>(`${base}`);
+  const list = async ({ page = 0, size = 10 }: PageRequest = {}): Promise<ApiResult<PageResponse<IUsuarioResponse>>> => {
+    const params = new URLSearchParams({ page: String(page), size: String(size) });
+    const res = await apiGet<PageResponse<IUsuarioResponse>>(`${base}?${params}`);
     if (!res.success) handleErrorToast(res);
     return res;
   };
@@ -66,6 +66,7 @@ export const useApiUsuario = () => {
     else handleErrorToast(res);
     return res;
   };
+
 
   return { list, getById, create, update, remove };
 };
