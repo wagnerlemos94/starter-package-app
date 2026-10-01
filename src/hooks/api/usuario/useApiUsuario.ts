@@ -23,6 +23,12 @@ export interface IUsuarioResponse {
   profileId: UUID;
 }
 
+export interface IUsuarioContaRequest {
+  name: string;
+  password?: string;
+  currentPassword?: string;
+}
+
 export const useApiUsuario = () => {
   const { showToast } = useToast();
 
@@ -68,7 +74,19 @@ export const useApiUsuario = () => {
   };
 
 
-  return { list, getById, create, update, remove };
+  const getCurrent = async (): Promise<ApiResult<IUsuarioResponse>> => {
+    const res = await apiGet<IUsuarioResponse>(`${base}/me`);
+    if (!res.success) handleErrorToast(res);
+    return res;
+  };
+
+  const updateCurrent = async (payload: IUsuarioContaRequest): Promise<ApiResult<IUsuarioResponse>> => {
+    const res = await apiPut<IUsuarioResponse>(`${base}/me`, payload);
+    if (!res.success) handleErrorToast(res);
+    return res;
+  };
+
+  return { list, getById, create, update, remove, getCurrent, updateCurrent };
 };
 
 export default useApiUsuario;

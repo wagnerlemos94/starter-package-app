@@ -7,7 +7,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import ArticleIcon from "@mui/icons-material/Article";
+import MenuIcon from "@mui/icons-material/Menu";
 import useDrawer from "./useDrawer";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -128,6 +128,7 @@ export default function DrawerComponent() {
     return (
         <>
             <Button
+                aria-label="Abrir menu de navegação"
                 onClick={toggleDrawer(true)}
                 sx={{
                     minWidth: 44,
@@ -141,7 +142,7 @@ export default function DrawerComponent() {
                     },
                 }}
             >
-                <ArticleIcon
+                <MenuIcon
                     sx={{
                         color: theme.color.white,
                         opacity: 0.9,

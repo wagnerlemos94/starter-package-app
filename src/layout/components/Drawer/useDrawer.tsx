@@ -1,6 +1,7 @@
 import { useState } from "react";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
+import ScienceOutlinedIcon from "@mui/icons-material/ScienceOutlined";
+import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
+import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import { RESOURCE } from "../../../auth/resources";
 import { usePermission } from "@/auth/usePermission";
 
@@ -23,19 +24,19 @@ export default function Drawer() {
 
   const menuList: DrawerComponentProps["menuList"] = [
     {
-      text: "Inbox",
-      icon: <InboxIcon />,
+      text: "Exemplos",
+      icon: <ScienceOutlinedIcon />,
       href: "/exemplo",
     },
     {
-      text: "Usuário",
-      icon: <MailIcon />,
+      text: "Usuários",
+      icon: <PeopleAltOutlinedIcon />,
       href: "/usuario",
       resource: RESOURCE.USUARIO,
     },
     {
-      text: "Perfil",
-      icon: <InboxIcon />,
+      text: "Perfis",
+      icon: <AdminPanelSettingsOutlinedIcon />,
       href: "/perfil",
       resource: RESOURCE.PERFIL,
     },

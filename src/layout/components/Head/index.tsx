@@ -1,5 +1,7 @@
 import DrawerComponent from '../Drawer';
-import { Avatar, ListItemButton, ListItemText } from '@mui/material';
+import { Avatar, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined';
+import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { useSession } from 'next-auth/react';
 import { theme } from '@/layout/globalStyles/theme';
 import ExpandLess from '@mui/icons-material/ExpandLess';
@@ -7,6 +9,7 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import { useState } from 'react';
 import { useLogin } from '@/features/auth/useLogin';
 import { appConfig } from '@/config/appConfig';
+import Link from 'next/link';
 
 
 const HEADER_HEIGHT = 64;
@@ -45,7 +48,7 @@ const Head: React.FC = () => {
                     </div>
                     <div style={{ position: 'relative' }}>
 
-                        <ListItemButton onClick={() => setOpen(!open)} sx={{ color: theme.color.white }}>
+                        <ListItemButton onClick={() => setOpen(!open)} aria-label="Menu da conta" aria-expanded={open} sx={{ color: theme.color.white }}>
                             <Avatar
                                 src=""
                                 sx={{ width: 30, height: 30 }}
@@ -58,7 +61,16 @@ const Head: React.FC = () => {
 
                         {open && (
                             <div style={{ position: 'absolute', right: 0, top: '3.2rem', background: theme.color.white, color: theme.color.black, borderRadius: 6, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', minWidth: 160, zIndex: 1100 }}>
+                                <ListItemButton component={Link} href="/minha-conta" onClick={() => setOpen(false)}>
+                                    <ListItemIcon sx={{ minWidth: 36, color: 'inherit' }}>
+                                        <ManageAccountsOutlinedIcon fontSize="small" />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Minha conta" />
+                                </ListItemButton>
                                 <ListItemButton onClick={logout}>
+                                    <ListItemIcon sx={{ minWidth: 36, color: 'inherit' }}>
+                                        <LogoutOutlinedIcon fontSize="small" />
+                                    </ListItemIcon>
                                     <ListItemText primary="Sair" />
                                 </ListItemButton>
                             </div>

@@ -16,6 +16,9 @@ Repositórios relacionados:
 - CRUD de perfis e associação de permissões.
 - Consulta de recursos e permissões fornecidos pela API.
 - Componentes reutilizáveis para formulários, tabelas e modais.
+- Edição do próprio nome e senha em “Minha conta”, pelo menu do usuário.
+
+Os menus usam ícones Material compatíveis com cada ação: pessoas para Usuários, escudo para Perfis, laboratório para Exemplos, gerenciamento de conta para Minha conta e saída para Sair.
 
 ## Requisitos
 
@@ -148,6 +151,7 @@ Todas as páginas privadas exigem uma sessão válida. A matriz em `src/auth/rou
 | Domínio | Operações usadas pelo app |
 |---|---|
 | Login | `POST /auth/login` |
+| Própria conta | `GET /usuario/me`, `PUT /usuario/me` |
 | Usuários | `GET /usuario`, `GET /usuario/{id}`, `POST /usuario`, `PUT /usuario/{id}`, `DELETE /usuario/{id}` |
 | Perfis | `GET /perfil`, `GET /perfil/{id}`, `POST /perfil`, `PUT /perfil/{id}`, `DELETE /perfil/{id}` |
 | Recursos | `GET /recurso`, `GET /recurso/{id}` |
@@ -174,6 +178,14 @@ Sem parâmetros, `list()` usa a página 0 com 10 registros. O retorno é sempre 
 As tabelas de usuários e perfis consultam o servidor ao trocar de página ou de tamanho (10, 25 ou 50 registros). `DataTable` recebe `pagination` com a página, o tamanho, o total e os callbacks; nesse modo, exibe os registros recebidos sem aplicar um segundo recorte local. Respostas de consultas antigas são ignoradas e, se a página deixar de existir após uma exclusão, a listagem retorna à última página disponível. Sem `pagination`, a tabela mantém a paginação local.
 
 Os formulários de usuário e perfil consultam apenas a primeira página com 20 registros para as opções de perfis, recursos e permissões. Eles não percorrem todas as páginas. Se um caso precisar de uma lista completa, implemente uma consulta sem paginação específica para esse caso.
+
+## Minha conta
+
+No menu do nome do usuário, escolha **Minha conta** para abrir `/minha-conta`. A página exige uma sessão válida e pode ser usada mesmo sem permissões administrativas de usuários.
+
+O formulário permite alterar o nome e a senha. CPF é somente leitura; perfil e status permanecem sob administração. Deixe a nova senha em branco para manter a senha atual. A troca de senha exige a senha atual e uma nova senha entre 8 e 72 caracteres.
+
+O hook `useFormMinhaConta` usa `getCurrent` e `updateCurrent` de `useApiUsuario`, preservando `ApiResult<IUsuarioResponse>`. Após salvar, os campos de senha são limpos e a sessão NextAuth relê o nome na API para atualizar o cabeçalho. A atualização da sessão não aceita identidade nem permissões enviadas pelo navegador.
 
 ## Estrutura principal
 

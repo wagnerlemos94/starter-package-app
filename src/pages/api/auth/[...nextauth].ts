@@ -60,7 +60,7 @@ export const authOptions: AuthOptions = {
     signIn: "/login",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.username = user.username;
         token.name = user.name;
@@ -69,11 +69,28 @@ export const authOptions: AuthOptions = {
         token.resource = user.resource;
       }
 
+      if (trigger === 'update' && token.accessToken && !isAccessTokenExpired(token.accessTokenExpiresAt)) {
+        // Releia o nome na API: não aceite dados de identidade enviados pelo navegador.
+        try {
+          const base = process.env.NEXT_PUBLIC_BASE_URL || '';
+          const response = await fetch(`${base.replace(/\/$/, '')}/usuario/me`, {
+            headers: { Authorization: `Bearer ${token.accessToken}` },
+          });
+          if (response.ok) {
+            const usuario: { name?: unknown } = await response.json();
+            if (typeof usuario.name === 'string') token.name = usuario.name;
+          }
+        } catch {
+          // Mantém a sessão válida quando a API estiver indisponível.
+        }
+      }
+
       return token;
     },
     async session({ session, token }) {
       const expired = isAccessTokenExpired(token.accessTokenExpiresAt);
 
+      session.user.name = token.name ?? '';
       session.user.username = token.username ?? "";
       session.user.resource = token.resource ?? {};
       session.accessToken = expired ? "" : token.accessToken ?? "";

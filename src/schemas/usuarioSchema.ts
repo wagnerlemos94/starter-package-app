@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { isValidCPF } from '@/utils/isValidCPF';
+import { isValidCPF } from '../utils/isValidCPF';
 
 export const usuarioFormSchema = z.object({
   cpf: z
@@ -28,4 +28,26 @@ export const usuarioFormDefaultValues: UsuarioFormSchema = {
   profileId: '',
   password: '',
   active: true,
+};
+
+export const usuarioContaSchema = usuarioFormSchema.pick({ name: true, password: true })
+  .extend({
+    name: z.string().trim().min(1, 'Nome é obrigatório').max(150, 'Nome deve conter no máximo 150 caracteres'),
+    password: usuarioFormSchema.shape.password.refine((value) => value === '' || value.trim().length > 0, {
+      message: 'Senha não pode conter apenas espaços',
+    }),
+    currentPassword: z.string().max(72, 'Senha deve conter no máximo 72 caracteres'),
+  })
+  .superRefine((data, context) => {
+    if (data.password && !data.currentPassword) {
+      context.addIssue({ code: 'custom', path: ['currentPassword'], message: 'Informe a senha atual para alterar a senha' });
+    }
+  });
+
+export type UsuarioContaSchema = z.infer<typeof usuarioContaSchema>;
+
+export const usuarioContaDefaultValues: UsuarioContaSchema = {
+  name: '',
+  password: '',
+  currentPassword: '',
 };
