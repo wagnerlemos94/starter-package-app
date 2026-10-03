@@ -14,13 +14,13 @@ const useUsuario = () => {
   const { list, remove } = useApiUsuario();
 
   const columns = [
-    { key: 'name', label: 'Nome' },
+    { key: 'nome', label: 'Nome' },
     { key: 'cpf', label: 'CPF' },
-    { key: 'active', label: 'Status' },
+    { key: 'ativo', label: 'Status' },
     {
-      key: 'profile',
+      key: 'perfil',
       label: 'Perfil',
-      render: (_value: unknown, row: IUsuarioResponse) => row.profile ?? '-',
+      render: (_value: unknown, row: IUsuarioResponse) => row.perfil ?? '-',
     },
   ];
 
@@ -57,7 +57,7 @@ const useUsuario = () => {
         if (page > lastPage) { setPage(lastPage); return response; }
         setListUsuario(response.data.content.map((item: IUsuarioResponse) => ({
           ...item,
-          active: item.active ? 'Ativo' : 'Inativo',
+          ativo: item.ativo ? 'Ativo' : 'Inativo',
         })) || []);
       }
       return response;

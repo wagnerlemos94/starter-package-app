@@ -10,7 +10,7 @@ describe('atualização da sessão após editar a própria conta', () => {
   afterEach(() => vi.unstubAllGlobals());
 
   it('relê o nome autenticado na API e ignora identidade e permissões do cliente', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ name: 'Nome salvo' }) });
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ nome: 'Nome salvo' }) });
     vi.stubGlobal('fetch', fetchMock);
     const token = { name: 'Anterior', username: '00000000535', accessToken: 'token-original',
       accessTokenExpiresAt: Date.now() + 60_000, resource: {} };

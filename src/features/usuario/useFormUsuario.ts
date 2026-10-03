@@ -57,10 +57,10 @@ export default function useFormUsuario() {
 
       reset({
         cpf: response.data.cpf,
-        name: response.data.name,
-        profileId: response.data.profileId ?? '',
-        password: '',
-        active: !!response.data.active,
+        nome: response.data.nome,
+        perfilId: response.data.perfilId ?? '',
+        senha: '',
+        ativo: !!response.data.ativo,
       });
     } catch {
       showToast('Erro ao carregar os dados!', 'error');
@@ -85,8 +85,8 @@ export default function useFormUsuario() {
   }, [query.id, router.isReady]);
 
   const salvar = async (data: UsuarioFormSchema) => {
-    if (!query.id && !data.password) {
-      setError('password', {
+    if (!query.id && !data.senha) {
+      setError('senha', {
         type: 'manual',
         message: 'Senha é obrigatória no cadastro',
       });
@@ -97,7 +97,7 @@ export default function useFormUsuario() {
     try {
       const payload = {
         ...data,
-        password: data.password || undefined,
+        senha: data.senha || undefined,
       };
       const response = query.id
         ? await update(String(query.id), payload)

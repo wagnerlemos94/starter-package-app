@@ -179,6 +179,12 @@ As tabelas de usuários e perfis consultam o servidor ao trocar de página ou de
 
 Os formulários de usuário e perfil consultam apenas a primeira página com 20 registros para as opções de perfis, recursos e permissões. Eles não percorrem todas as páginas. Se um caso precisar de uma lista completa, implemente uma consulta sem paginação específica para esse caso.
 
+## Dashboard inicial
+
+A página `/` consulta `GET /dashboard` quando a sessão possui `DASHBOARD:VIEW`. Exibe totais consolidados de usuários e perfis, distribuição por status, resumos por categoria e atalhos conforme as permissões. O botão **Atualizar dados** renova a consulta; falhas preservam os últimos indicadores com um aviso. Estados de carregamento, ausência de dados e falta de permissão são tratados sem usar dados fictícios.
+
+A API precisa da migration V8 e o perfil deve receber `VIEW` para o recurso `DASHBOARD`. Faça login novamente após alterar permissões. A página inicial continua disponível para usuários autenticados sem essa permissão, mostrando somente os atalhos autorizados.
+
 ## Minha conta
 
 No menu do nome do usuário, escolha **Minha conta** para abrir `/minha-conta`. A página exige uma sessão válida e pode ser usada mesmo sem permissões administrativas de usuários.
@@ -211,12 +217,14 @@ Usuário:
 interface IUsuarioRequest {
   id?: string;
   cpf: string;
-  name: string;
-  profileId: string;
-  password?: string;
-  active: boolean;
+  nome: string;
+  perfilId: string;
+  senha?: string;
+  ativo: boolean;
 }
 ```
+
+A resposta de usuário usa `nome`, `ativo`, `perfil` (nome do perfil) e `perfilId` (UUID), além de `id` e `cpf`. Em `/usuario/me`, a atualização envia `nome`, `senha` e `senhaAtual`; as senhas são opcionais quando somente o nome muda. Estes contratos exigem a versão da API com a migration V7. O login mantém o campo `password` na chamada à API.
 
 Perfil:
 

@@ -77,8 +77,8 @@ export const authOptions: AuthOptions = {
             headers: { Authorization: `Bearer ${token.accessToken}` },
           });
           if (response.ok) {
-            const usuario: { name?: unknown } = await response.json();
-            if (typeof usuario.name === 'string') token.name = usuario.name;
+            const usuario: { nome?: unknown } = await response.json();
+            if (typeof usuario.nome === 'string') token.name = usuario.nome;
           }
         } catch {
           // Mantém a sessão válida quando a API estiver indisponível.

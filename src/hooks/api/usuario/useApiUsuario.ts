@@ -8,25 +8,25 @@ type UUID = string;
 export interface IUsuarioRequest {
   id?: UUID;
   cpf: string;
-  name: string;
-  profileId: UUID;
-  password?: string;
-  active: boolean;
+  nome: string;
+  perfilId: UUID;
+  senha?: string;
+  ativo: boolean;
 }
 
 export interface IUsuarioResponse {
   id: UUID;
   cpf: string;
-  name: string;
-  active: boolean | string;
-  profile: string;
-  profileId: UUID;
+  nome: string;
+  ativo: boolean | string;
+  perfil: string;
+  perfilId: UUID;
 }
 
 export interface IUsuarioContaRequest {
-  name: string;
-  password?: string;
-  currentPassword?: string;
+  nome: string;
+  senha?: string;
+  senhaAtual?: string;
 }
 
 export const useApiUsuario = () => {

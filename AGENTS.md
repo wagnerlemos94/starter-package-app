@@ -35,7 +35,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 - O JWT da API vem de `accessToken` na sessão NextAuth; não o duplique no `localStorage`.
 - Preserve o envio Bearer token, o logout em resposta 401 e a autorização de rotas e ações em `src/auth` e `src/proxy.ts`.
-- Preserve `profile` como nome e `profileId` como identificador na resposta de usuário.
+- Preserve `perfil` como nome e `perfilId` como identificador na resposta de usuário.
 - `/minha-conta` é acessível por sessão válida, pelo menu do cabeçalho. Use `GET/PUT /usuario/me`; CPF é somente leitura e perfil/status não são editáveis. Ao salvar, atualize o nome da sessão a partir da API, sem confiar em dados de identidade enviados pelo cliente.
 - Use React Hook Form com os schemas Zod existentes. Na edição de usuário, senha vazia deve ser omitida para preservar a senha atual.
 - Exiba mensagens e rótulos em português e siga o tema e os padrões visuais existentes.

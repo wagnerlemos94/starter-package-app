@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ScienceOutlinedIcon from "@mui/icons-material/ScienceOutlined";
+import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import { RESOURCE } from "../../../auth/resources";
@@ -23,6 +24,12 @@ export default function Drawer() {
   };
 
   const menuList: DrawerComponentProps["menuList"] = [
+    {
+      text: "Dashboard",
+      icon: <DashboardOutlinedIcon />,
+      href: "/",
+      resource: RESOURCE.DASHBOARD,
+    },
     {
       text: "Exemplos",
       icon: <ScienceOutlinedIcon />,

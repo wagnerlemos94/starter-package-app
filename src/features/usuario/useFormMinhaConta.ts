@@ -21,22 +21,22 @@ export default function useFormMinhaConta() {
   const { showToast } = useToast();
 
   useEffect(() => {
-    let active = true;
+    let ativo = true;
     const carregar = async () => {
       try {
         const response = await getCurrent();
-        if (!active || !response.success) return;
+        if (!ativo || !response.success) return;
         setCpf(response.data.cpf);
-        reset({ ...usuarioContaDefaultValues, name: response.data.name });
+        reset({ ...usuarioContaDefaultValues, nome: response.data.nome });
         setLoaded(true);
       } catch {
-        if (active) showToast('Erro ao carregar sua conta', 'error');
+        if (ativo) showToast('Erro ao carregar sua conta', 'error');
       } finally {
-        if (active) setLoading(false);
+        if (ativo) setLoading(false);
       }
     };
     void carregar();
-    return () => { active = false; };
+    return () => { ativo = false; };
     // Carrega a própria conta uma vez ao abrir a página.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -46,9 +46,9 @@ export default function useFormMinhaConta() {
     setIsSubmitting(true);
     try {
       const response = await updateCurrent({
-        name: data.name,
-        password: data.password || undefined,
-        currentPassword: data.password ? data.currentPassword : undefined,
+        nome: data.nome,
+        senha: data.senha || undefined,
+        senhaAtual: data.senha ? data.senhaAtual : undefined,
       });
       if (!response.success) {
         response.errors.forEach(({ field, message }) => {
@@ -56,11 +56,11 @@ export default function useFormMinhaConta() {
         });
         return;
       }
-      reset({ ...usuarioContaDefaultValues, name: response.data.name });
+      reset({ ...usuarioContaDefaultValues, nome: response.data.nome });
       showToast('Sua conta foi atualizada com sucesso', 'success');
       try {
         const session = await updateSession();
-        if (session?.user.name !== response.data.name) {
+        if (session?.user.name !== response.data.nome) {
           showToast('Dados salvos. Atualize sua sessão para exibir o novo nome no menu.', 'info');
         }
       } catch {
